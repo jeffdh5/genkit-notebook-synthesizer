@@ -235,16 +235,39 @@ export const testAudioFlow = onFlow(
     }),
   },
   async () => {
-    const testText = "Hello! This is a simple test of the audio synthesis. I hope it works well!";
-    console.log('Starting test audio synthesis with:', testText);
-
-    const scriptSection = {
-      speaker: "Alex",
-      lines: [testText]
-    };
+    const scriptSections = [
+      {
+        speaker: "Alex",
+        lines: [
+          "Hey Jamie, did you hear about the new tech release? Uh, it's supposed to be revolutionary.",
+          "Yeah, I mean, it's like... you know, the next big thing, right?"
+        ]
+      },
+      {
+        speaker: "Jamie",
+        lines: [
+          "Oh, absolutely Alex! I was just reading about it, and it's, um, quite fascinating.",
+          "I think it's going to change the way we, uh, interact with technology."
+        ]
+      },
+      {
+        speaker: "Alex",
+        lines: [
+          "Exactly! And, uh, the features they're introducing are just... wow.",
+          "I can't wait to get my hands on it."
+        ]
+      },
+      {
+        speaker: "Jamie",
+        lines: [
+          "Same here! It's going to be a game-changer for sure.",
+          "Let's see how it, uh, unfolds in the coming months."
+        ]
+      }
+    ];
 
     const outputFileName = `test_audio_${Date.now()}.mp3`;
-    await synthesizePodcastAudio([scriptSection], outputFileName);
+    await synthesizePodcastAudio(scriptSections, outputFileName);
 
     return {
       audioFile: outputFileName
@@ -269,8 +292,6 @@ type PodcastScriptSection = {
   speaker: string;
   lines: string[];
 };
-
-const writeFileAsync = promisify(fs.writeFile);
 
 enum SsmlVoiceGender {
   UNSPECIFIED = "SSML_VOICE_GENDER_UNSPECIFIED",
@@ -313,10 +334,13 @@ export async function synthesizePodcastAudio(
           input: { text: line },
           voice: {
             languageCode: "en-US",
-            ssmlGender: section.speaker === "Alex" ? SsmlVoiceGender.MALE : SsmlVoiceGender.FEMALE,
+            name: section.speaker === "Alex" ? "en-US-Journey-D" : "en-US-Journey-F",
           },
           audioConfig: {
-            audioEncoding: AudioEncoding.MP3,
+            audioEncoding: AudioEncoding.LINEAR16,
+            effectsProfileId: ["small-bluetooth-speaker-class-device"],
+            pitch: 0,
+            speakingRate: 1,
           },
         };
         
@@ -327,10 +351,11 @@ export async function synthesizePodcastAudio(
         }
         
         const segmentFileName = `segment_${segmentIndex}_${section.speaker}.mp3`;
-        await writeFileAsync(segmentFileName, response.audioContent, "binary");
+        console.log(`Writing audio content to file: ${segmentFileName}`);
+        await fs.writeFile(segmentFileName, response.audioContent, "binary");
+        console.log(`Successfully wrote audio content to file: ${segmentFileName}`);
         segmentFiles.push(segmentFileName);
         segmentIndex++;
-        console.log(`Wrote segment file: ${segmentFileName}`);
       }
     }
 
