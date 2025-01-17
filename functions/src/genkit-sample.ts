@@ -7,7 +7,6 @@ import pdfParse from "pdf-parse";
 import textToSpeech from "@google-cloud/text-to-speech";
 
 import ffmpeg from "fluent-ffmpeg";
-import { promisify } from "util";
 
 // Import models from the Google AI plugin. The Google AI API provides access to
 // several generative models. Here, we import Gemini 1.5 Flash.
@@ -153,7 +152,17 @@ export const multiStepPodcastFlow = onFlow(
       - Some possible host banter or transitions:
         ${banterLines.join("\n")}
 
-      Now produce a final script for a podcast with the two hosts, Alex and Jamie.
+      Now produce a final script for a podcast with the hosts Alex and Jamie.
+      Make it sound like a genuine, unscripted conversation by:
+      - Including natural verbal fillers (um, uh, like, you know)
+      - Having hosts naturally interrupt or talk over each other
+      - Including reactive responses and commentary ("Yeah!", "Oh wow", "Wait, really?")
+      - Making hosts trail off thoughts naturally
+      - Having them build on each other's points
+      - Including genuine reactions to what the other person says
+      - Having hosts occasionally correct or rephrase themselves mid-thought
+      - Adding natural laughter and casual banter between points
+
       Format it as an array of JSON objects. Each object should have:
         "speaker" (either "Alex" or "Jamie")
         "lines" (an array of strings representing what that speaker says).
@@ -162,6 +171,7 @@ export const multiStepPodcastFlow = onFlow(
         1. Do NOT include the speaker's name in the lines themselves (i.e., no "Alex:" text).
         2. Each object should contain dialogue only from the speaker specified in the "speaker" key.
         3. Make sure the JSON output is valid, with no extra keys or text.
+        4. Keep it sounding completely natural and unscripted.
     `;
     const finalScriptResponse = await ai.generate({
       model: gemini15Flash,
