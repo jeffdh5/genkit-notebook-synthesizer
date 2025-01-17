@@ -291,13 +291,6 @@ export const testAudioFlow = onFlow(
 type PodcastScriptSection = {
   speaker: string;
   lines: string[];
-};
-
-enum SsmlVoiceGender {
-  UNSPECIFIED = "SSML_VOICE_GENDER_UNSPECIFIED",
-  MALE = "MALE",
-  FEMALE = "FEMALE",
-  NEUTRAL = "NEUTRAL",
 }
 
 enum AudioEncoding {
