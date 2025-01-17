@@ -71,162 +71,122 @@ export const multiStepPodcastFlow = onFlow(
     inputSchema: InputSchema,
     outputSchema: OutputSchema,
     authPolicy: firebaseAuth((user) => {
-      // For demonstration, we just require the user be logged in
-      // Otherwise throw
       if (!user) {
         throw new Error("User must be authenticated to run this flow");
       }
     }),
   },
   async (inputValues) => {
-    console.log('Starting multiStepPodcastFlow with input:', inputValues);
-
-    // 1. Read and parse the PDF
-    console.log('Reading PDF from:', inputValues.pdfPath);
+    // 1. Read the PDF
     const pdfPathAbsolute = path.join(process.cwd(), "src", inputValues.pdfPath);
     const pdfBuffer = await fs.readFile(pdfPathAbsolute);
     const parsedData = await pdfParse(pdfBuffer);
     const pdfContent = parsedData.text;
-    console.log('Successfully parsed PDF, content length:', pdfContent.length);
 
-    // 2. Summarize the PDF
-    console.log('Generating plain-English summary...');
-    const summarizationPrompt = `
-      Please read the following academic text and create a short, plain-English summary. 
-      Keep it moderately informal so it's approachable:
+    // 2. Summarize the PDF in a more specific way
+    const structuredSummaryPrompt = `
+      You will read the following academic text carefully.
+      Then, step by step, produce the following:
+      1) A brief summary (2-3 paragraphs) that captures the main argument and context.
+      2) A short list of direct quotes or excerpts (with page numbers if possible).
+      3) A bullet-list outline of the key points or sections in the paper, focusing on its
+         most interesting or controversial elements.
 
-      TEXT:
+      Text Content:
       ${pdfContent}
     `;
-    const summaryResponse = await ai.generate({
+    const structuredSummaryResponse = await ai.generate({
       model: gemini15Flash,
-      prompt: summarizationPrompt,
-      config: { temperature: 0.9 },
+      prompt: structuredSummaryPrompt,
+      config: { temperature: 0.8 },
     });
-    const summary = summaryResponse.text.trim();
-    console.log('Generated summary, length:', summary.length);
 
-    // 3. Extract key subtopics
-    console.log('Extracting key points...');
-    const keyPointsPrompt = `
-      Based on this summary:
-      "${summary}"
+    // Imagine the response is structured in some format, e.g., a simple text delimitation:
+    // "SUMMARY: ... QUOTES: ... OUTLINE: ..."
+    // For simplicity, let's parse them out with naive splitting or a more robust approach
+    // in a real-world scenario.
+    const structuredSections = structuredSummaryResponse.text.split("QUOTES:");
+    const summary = structuredSections[0].replace("SUMMARY:", "").trim();
+    const quotesAndOutlineRaw = structuredSections[1] || "";
+    const quotesBlock = quotesAndOutlineRaw.split("OUTLINE:")[0]?.trim();
+    const outlineBlock = quotesAndOutlineRaw.split("OUTLINE:")[1]?.trim();
 
-      List the key themes or subtopics that would be interesting 
-      discussion points for a podcast conversation.
-      Format them as a bullet list and keep them short.
+    // 3. Refine or highlight interesting angles:
+    const discussionHookPrompt = `
+      Below is an outline of the paper, followed by direct quotes and a short summary.
+
+      SUMMARY:
+      ${summary}
+
+      QUOTES:
+      ${quotesBlock}
+
+      OUTLINE:
+      ${outlineBlock}
+
+      Please suggest some thought-provoking angles or "hooks" for a podcast conversation:
+      - Summaries of controversies or debates in the text
+      - Surprising data or insights
+      - Real-world implications or hypothetical applications
+      - Potential points of friendly disagreement
+
+      Provide 5-7 bullet points, each with a specific question or angle of approach.
     `;
-    const keyPointsResponse = await ai.generate({
+    const discussionHooksResponse = await ai.generate({
       model: gemini15Flash,
-      prompt: keyPointsPrompt,
+      prompt: discussionHookPrompt,
       config: { temperature: 0.7 },
     });
-    const keyPoints = keyPointsResponse.text.split(/\n/g).map((p) => p.trim()).filter(Boolean);
-    console.log('Extracted key points:', keyPoints.length);
+    const hooks = discussionHooksResponse.text
+      .split(/\n/g)
+      .map((line) => line.trim())
+      .filter(Boolean);
 
-    // 4. Generate conversation hooks
-    console.log('Generating banter lines...');
-    const banterPrompt = `
-      We have these key topics:
-      ${keyPoints.join(", ")}
-
-      Propose a few playful or engaging "banter" lines or transitions 
-      that two hosts (Alex and Jamie) could use while discussing them.
-    `;
-    const banterRes = await ai.generate({
-      model: gemini15Flash,
-      prompt: banterPrompt,
-      config: { temperature: 1.0 },
-    });
-    const banterLines = banterRes.text.split(/\n/g).map((p) => p.trim()).filter(Boolean);
-    console.log('Generated banter lines:', banterLines.length);
-
-    // 5. Synthesize final script
-    console.log('Creating final script...');
+    // 4. Create the final script with direct quotes and deeper commentary
     const finalScriptPrompt = `
-      We have:
-      - A summary of the paper:
-        "${summary}"
-      - Key points to discuss:
-        ${keyPoints.join(", ")}
-      - Some possible host banter or transitions:
-        ${banterLines.join("\n")}
+      We have a summary, quotes, an outline, and these potential discussion hooks:
+      ${hooks.join("\n")}
 
-      Now produce a final script for a podcast with the hosts Alex and Jamie.
-      Make it sound like a genuine, unscripted conversation by:
-      - Including natural verbal fillers (um, uh, like, you know)
-      - Having hosts naturally interrupt or talk over each other
-      - Including reactive responses and commentary ("Yeah!", "Oh wow", "Wait, really?")
-      - Making hosts trail off thoughts naturally
-      - Having them build on each other's points
-      - Including genuine reactions to what the other person says
-      - Having hosts occasionally correct or rephrase themselves mid-thought
-      - Adding natural laughter and casual banter between points
-
-      Format it as an array of JSON objects. Each object should have:
-        "speaker" (either "Alex" or "Jamie")
-        "lines" (an array of strings representing what that speaker says).
+      Now create a podcast script for two hosts, Alex and Jamie, that:
+      - References at least 2 direct quotes from the paper (and highlight them naturally in the conversation).
+      - Explains some of the research or data.
+      - Demonstrates curiosity and debate between the two hosts (sometimes they disagree or challenge each other).
+      - Includes at least one comedic or lighthearted moment per key point.
+      - Provides context so a listener learns something concrete about the paper's findings.
+      - Allows for natural-sounding interjections ("Oh wow", "Wait, are you serious?") but keep them purposeful.
+      - “Show” how to be engaging by giving examples in the conversation (not just telling them to “sound interesting”).
       
+      Format the final script as valid JSON with the schema:
+      [
+        {
+          "speaker": "Alex" or "Jamie",
+          "lines": ["line 1", "line 2", ...]
+        },
+        ...
+      ]
+
       IMPORTANT:
-        1. Do NOT include the speaker's name in the lines themselves (i.e., no "Alex:" text).
-        2. Each object should contain dialogue only from the speaker specified in the "speaker" key.
-        3. Make sure the JSON output is valid, with no extra keys or text.
-        4. Keep it sounding completely natural and unscripted.
+       - The conversation should use actual content from the summary and quotes above.
+       - Keep it structured and ensure the final output is valid JSON only.
     `;
     const finalScriptResponse = await ai.generate({
       model: gemini15Flash,
       prompt: finalScriptPrompt,
-      // We can ask the model to produce JSON. We'll parse it into structured data.
-      output: { format: "json", schema: OutputSchema }, 
+      output: { format: "json", schema: OutputSchema },
       config: { temperature: 0.8 },
     });
 
-    // Get the script sections from the final response
+    // Retrieve script sections
     const scriptSections = finalScriptResponse.output?.scriptSections || [];
-    console.log('Generated script sections:', scriptSections.length);
-    
-    // Generate audio
-    console.log('Starting audio synthesis...');
-    await synthesizePodcastAudio(scriptSections, "finalPodcast.mp3");
-    console.log('Audio synthesis complete');
 
-    // Return the script sections as before
+    // Synthesize Audio
+    const outputFileName = `podcast_audio_${Date.now()}.mp3`;
+    await synthesizePodcastAudio(scriptSections, outputFileName);
+
+    // Return the final script sections
     return {
-      scriptSections
+      scriptSections,
     };
-  }
-);
-
-export const podcastScriptFlow = onFlow(
-  ai,
-  {
-    name: "podcastScriptFlow",
-    inputSchema: z.object({
-      pdfContent: z.string(),
-    }),
-    outputSchema: z.string(),
-    authPolicy: firebaseAuth((user) => {
-      // Add any additional auth requirements here
-    }),
-  },
-  async ({pdfContent}) => {
-    const response = await ai.generate({
-      model: gemini15Flash,
-      prompt: `
-        Generate an engaging podcast script with two hosts discussing the following content.
-        The hosts should be named Alex and Jamie. Make it conversational and natural, 
-        including casual banter and back-and-forth discussion.
-        
-        Content to discuss:
-        ${pdfContent}
-        
-        Format the output as a script with speaker names followed by their lines, like:
-        Alex: [dialogue]
-        Jamie: [dialogue]
-      `
-    });
-
-    return response.text;
   }
 );
 
