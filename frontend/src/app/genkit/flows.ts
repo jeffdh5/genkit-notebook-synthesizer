@@ -25,5 +25,19 @@ export const multiStepPodcastFlow = ai.defineFlow(
       })),
     }),
   },
+  async () => {
+    return {
+      scriptSections: [
+        {
+          speaker: "Alex",
+          lines: ["Let's talk about this fascinating topic..."]
+        },
+        {
+          speaker: "Jamie",
+          lines: ["I couldn't agree more! Here's what I think..."]
+        }
+      ]
+    };
+  }
   // Your existing flow logic here
 ); 

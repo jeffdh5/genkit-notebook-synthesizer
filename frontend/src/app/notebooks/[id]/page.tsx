@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { generatePodcast } from "@/app/genkit/actions";
 
 const MAX_SOURCES = 300;
 
@@ -35,6 +36,16 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
   const [newNote, setNewNote] = useState("");
   const [pastedText, setPastedText] = useState("");
   const [addSourceView, setAddSourceView] = useState<'main' | 'paste'>('main');
+  const [scriptSections, setScriptSections] = useState<Array<{ speaker: string; lines: string[] }>>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const sampleText = `The Rise of Artificial Intelligence in Modern Society
+
+  Artificial Intelligence (AI) has become an integral part of our daily lives, transforming how we work, communicate, and solve problems. From virtual assistants like Siri and Alexa to sophisticated algorithms that power social media feeds and recommend content, AI technologies are reshaping our interaction with digital systems.
+
+  Recent advances in machine learning, particularly in natural language processing and computer vision, have led to breakthrough applications in healthcare, finance, and education. Medical professionals now use AI to assist in diagnosis and treatment planning, while financial institutions employ AI algorithms for fraud detection and risk assessment.
+
+  However, the rapid adoption of AI also raises important ethical considerations. Questions about privacy, bias in AI systems, and the impact on employment have sparked crucial debates about responsible AI development. As we continue to integrate AI into more aspects of society, finding the balance between innovation and ethical considerations remains a key challenge.`;
 
   useEffect(() => {
     if (!id || Array.isArray(id)) return;
@@ -134,6 +145,21 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
       setAddSourceView('main');
     } catch (error) {
       console.error("Error adding pasted text source:", error);
+    }
+  };
+
+  const handleGenerateScript = async () => {
+    try {
+      setIsGenerating(true);
+      const formData = new FormData();
+      formData.append('text', sampleText);
+      const result = await generatePodcast(formData);
+      setScriptSections(result.scriptSections);
+      console.log(result);
+    } catch (error) {
+      console.error('Error generating script:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -365,7 +391,13 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
                   </div>
                   <div className="flex gap-3 mt-4">
                     <Button variant="outline" className="flex-1 hover:bg-accent">Customize</Button>
-                    <Button className="flex-1">Generate</Button>
+                    <Button 
+                      className="flex-1" 
+                      onClick={handleGenerateScript}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? "Generating..." : "Generate"}
+                    </Button>
                   </div>
                 </Card>
               </div>
