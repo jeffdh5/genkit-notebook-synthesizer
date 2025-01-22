@@ -25,12 +25,12 @@ export const multiStepPodcastFlow = ai.defineFlow(
       })),
     }),
   },
-  async () => {
+  async (input) => {
     return {
       scriptSections: [
         {
           speaker: "Alex",
-          lines: ["Let's talk about this fascinating topic..."]
+          lines: ["The test input was " + input.pdfPath]
         },
         {
           speaker: "Jamie",

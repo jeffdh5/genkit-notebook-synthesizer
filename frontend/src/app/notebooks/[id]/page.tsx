@@ -151,9 +151,7 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
   const handleGenerateScript = async () => {
     try {
       setIsGenerating(true);
-      const formData = new FormData();
-      formData.append('text', sampleText);
-      const result = await generatePodcast(formData);
+      const result = await generatePodcast({ pdfPath: "test.pdf" }); // Assuming pdfPath is defined elsewhere in your code
       setScriptSections(result.scriptSections);
       console.log(result);
     } catch (error) {

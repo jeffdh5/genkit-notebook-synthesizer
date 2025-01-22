@@ -2,7 +2,12 @@
 
 import { multiStepPodcastFlow } from './flows';
 
-export async function generatePodcast(formData: FormData) {
-  const pdfPath = formData.get('pdfPath')?.toString() || 'example.pdf';
+interface PodcastGenerationInput {
+  pdfPath: string;
+}
+
+export async function generatePodcast(data: PodcastGenerationInput) {
+  const pdfPath = data.pdfPath || 'example.pdf';
+  console.log(`Generating podcast with PDF path: ${pdfPath}`);
   return await multiStepPodcastFlow({ pdfPath });
 } 
