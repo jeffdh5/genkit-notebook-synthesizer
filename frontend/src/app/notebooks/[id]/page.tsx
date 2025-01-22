@@ -372,7 +372,7 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
 
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-muted-foreground">Notes</h3>
-                <div className="space-y-3">
+              <div className="space-y-3">
                   {notes.map((note) => (
                     <Card key={note.id} className="p-4 hover:shadow-md transition-shadow">
                       <p className="text-sm">{note.content}</p>
