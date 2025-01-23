@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { generatePodcast, generatePodcastV2 } from "@/app/genkit/actions";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const MAX_SOURCES = 300;
 
@@ -38,6 +39,7 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
   const [addSourceView, setAddSourceView] = useState<'main' | 'paste'>('main');
   const [scriptSections, setScriptSections] = useState<Array<{ speaker: string; lines: string[] }>>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const sampleText = `The Rise of Artificial Intelligence in Modern Society
 
@@ -167,6 +169,7 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
   const handleGenerateScriptV2 = async () => {
     try {
       setIsGenerating(true);
+      setAudioUrl(null); // Reset audio URL when generating new content
 
       // Fetch sources from the database
       const sourcesCollection = collection(db, "notebooks", id, "sources");
@@ -179,6 +182,15 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
 
       const result = await generatePodcastV2({ sourceText });
       setScriptSections(result.scriptSections);
+      
+      // Get the signed URL for the audio file
+      if (result.storageUrl) {
+        const storage = getStorage();
+        const audioRef = ref(storage, result.storageUrl);
+        const url = await getDownloadURL(audioRef);
+        setAudioUrl(url);
+      }
+      
       console.log(result);
     } catch (error) {
       console.error('Error generating script:', error);
@@ -423,6 +435,17 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
                       {isGenerating ? "Generating..." : "Generate"}
                     </Button>
                   </div>
+                  {audioUrl && (
+                    <div className="mt-4">
+                      <audio 
+                        controls 
+                        className="w-full"
+                        src={audioUrl}
+                      >
+                        Your browser does not support the audio element.
+                      </audio>
+                    </div>
+                  )}
                 </Card>
               </div>
 
