@@ -23,9 +23,10 @@ import { generatePodcast, generatePodcastV2 } from "@/app/genkit/actions";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const MAX_SOURCES = 300;
+type tParams = Promise<{ id: string }>;
 
-export default function NotebookDetailPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function NotebookDetailPage(props: { params: tParams }) {
+  const { id } = await props.params;
   const [title, setTitle] = useState("");
   const [sources, setSources] = useState<Array<{ id: string; title: string; content: string }>>([]);
   const [newSourceTitle, setNewSourceTitle] = useState("");
