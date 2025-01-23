@@ -1,3 +1,5 @@
+"use client";
+import * as React from 'react';
 import { NotebookDetailClient } from "./NotebookDetail";
 
 type Params = {
@@ -6,11 +8,10 @@ type Params = {
   };
 }
 
-// This remains a Server Component
-export default async function NotebookDetailPage({ params }: Params) {
-  const { id } = await params;
-  
+function NotebookDetailPage({ params }: { params: React.Usable<{ id: string }> }) {
+  // asynchronous access of `params.id`.
+  const { id } = React.use(params);
   return <NotebookDetailClient id={id} />;
 }
 
-// Create a new client component in a separate file 
+export default NotebookDetailPage;
