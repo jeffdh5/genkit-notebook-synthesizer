@@ -24,9 +24,8 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const MAX_SOURCES = 300;
 
-export default function NotebookDetailPage({ params }: { params: Usable<{ id: string }> }) {
-  const unwrappedParams = use(params);
-  const id = unwrappedParams.id;
+export default function NotebookDetailPage({ params }: { params: { id: string } }) {
+  const id = params.id;
   const [title, setTitle] = useState("");
   const [sources, setSources] = useState<Array<{ id: string; title: string; content: string }>>([]);
   const [newSourceTitle, setNewSourceTitle] = useState("");
