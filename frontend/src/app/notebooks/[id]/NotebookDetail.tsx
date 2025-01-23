@@ -31,8 +31,6 @@ const MAX_SOURCES = 300;
 export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
   const [title, setTitle] = useState("");
   const [sources, setSources] = useState<Array<{ id: string; title: string; content: string }>>([]);
-  const [newSourceTitle, setNewSourceTitle] = useState("");
-  const [newSourceContent, setNewSourceContent] = useState("");
   const [messages, setMessages] = useState<Array<{ id: string; content: string; sender: 'user' | 'ai' }>>([]);
   const [newMessage, setNewMessage] = useState('');
   const [notes, setNotes] = useState<Array<{ id: string; content: string }>>([]);
@@ -70,25 +68,6 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
       unsubscribeSources();
     };
   }, [id]);
-
-  const handleAddSource = async () => {
-    if (!id || !newSourceTitle || !newSourceContent) return;
-    
-    try {
-      const sourcesCollection = collection(db, "notebooks", id, "sources");
-      await addDoc(sourcesCollection, {
-        title: newSourceTitle,
-        content: newSourceContent,
-        createdAt: new Date(),
-      });
-      
-      // Reset form
-      setNewSourceTitle("");
-      setNewSourceContent("");
-    } catch (error) {
-      console.error("Error adding source:", error);
-    }
-  };
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
