@@ -276,6 +276,7 @@ const endToEndPodcastOutputSchema = z.object({
       lines: z.array(z.string()),
     })
   ),
+  storageUrl: z.string(),
 });
 
 export const endToEndPodcastFlow = ai.defineFlow(
