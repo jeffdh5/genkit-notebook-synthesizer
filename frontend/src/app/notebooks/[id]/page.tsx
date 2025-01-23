@@ -1,5 +1,9 @@
 import { NotebookDetailClient } from "./NotebookDetail";
 
+type tParams = {
+  id: string;
+};
+
 // This remains a Server Component
 export default async function NotebookDetailPage(props: { params: tParams }) {
   const { id } = await props.params;
