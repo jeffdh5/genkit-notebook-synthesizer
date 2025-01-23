@@ -33,7 +33,7 @@ npm run dev
 ## Available Development URLs
 
 - **Application UI**: [http://localhost:3000/notebooks](http://localhost:3000/notebooks)
-- **Genkit Dev Interface**: [http://localhost:4000](http://localhost:4000) (for flow testing)
+- **Genkit Dev UI**: [http://localhost:4000](http://localhost:4000) (for flow testing)
 
 ## Deployment
 
