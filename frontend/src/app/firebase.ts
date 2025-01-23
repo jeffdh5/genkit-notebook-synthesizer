@@ -1,16 +1,17 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import dotenv from 'dotenv';
 
-// TODO: Use your own configuration values from Firebase console
+dotenv.config();
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCvFaGyodKXnF7HKYsM_KmZqqHvwc1vyOM",
-  authDomain: "smarthome-d6e27.firebaseapp.com",
-  projectId: "smarthome-d6e27",
-  storageBucket: "smarthome-d6e27.firebasestorage.app",
-  messagingSenderId: "493446833170",
-  appId: "1:493446833170:web:553893d26187f7e8a9e4cb"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
-
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
