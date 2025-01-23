@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Plus, Calendar } from "lucide-react";
+import { Plus, Calendar, Trash2 } from "lucide-react";
 
 type Notebook = {
   id: string;
@@ -37,6 +37,13 @@ export default function NotebookListPage() {
       title: newNotebookTitle,
     });
     setNewNotebookTitle("");
+  }
+
+  async function deleteNotebook(id: string, e: React.MouseEvent) {
+    e.preventDefault(); // Prevent the Link click from firing
+    if (confirm("Are you sure you want to delete this notebook?")) {
+      await deleteDoc(doc(db, "notebooks", id));
+    }
   }
 
   return (
@@ -77,9 +84,19 @@ export default function NotebookListPage() {
               >
                 <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                   <CardHeader className="pb-3">
-                    <CardTitle className="group-hover:text-primary transition-colors">
-                      {notebook.title}
-                    </CardTitle>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="group-hover:text-primary transition-colors">
+                        {notebook.title}
+                      </CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => deleteNotebook(notebook.id, e)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">

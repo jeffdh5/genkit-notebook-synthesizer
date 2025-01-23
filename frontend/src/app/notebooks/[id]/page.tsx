@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use, Usable } from "react";
 import { db } from "../../firebase";
-import { doc, onSnapshot, collection, addDoc } from "firebase/firestore";
+import { doc, onSnapshot, collection, addDoc, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { generatePodcast } from "@/app/genkit/actions";
+import { generatePodcast, generatePodcastV2 } from "@/app/genkit/actions";
 
 const MAX_SOURCES = 300;
 
@@ -151,7 +151,33 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
   const handleGenerateScript = async () => {
     try {
       setIsGenerating(true);
-      const result = await generatePodcast({ pdfPath: "test.pdf" }); // Assuming pdfPath is defined elsewhere in your code
+
+      const pdfPath = 'test.pdf';
+      const result = await generatePodcast({ pdfPath });
+      setScriptSections(result.scriptSections);
+      console.log(result);
+    } catch (error) {
+      console.error('Error generating script:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  
+  const handleGenerateScriptV2 = async () => {
+    try {
+      setIsGenerating(true);
+
+      // Fetch sources from the database
+      const sourcesCollection = collection(db, "notebooks", id, "sources");
+      const sourcesSnapshot = await getDocs(sourcesCollection);
+      const sources = sourcesSnapshot.docs.map((doc, index) => {
+        return `===== START SOURCE ${index + 1} =====\n${doc.data().content}\n===== END SOURCE ${index + 1} ======`;
+      });
+
+      const sourceText = sources.join("\n\n");
+
+      const result = await generatePodcastV2({ sourceText });
       setScriptSections(result.scriptSections);
       console.log(result);
     } catch (error) {
@@ -391,7 +417,7 @@ export default function NotebookDetailPage({ params }: { params: Usable<{ id: st
                     <Button variant="outline" className="flex-1 hover:bg-accent">Customize</Button>
                     <Button 
                       className="flex-1" 
-                      onClick={handleGenerateScript}
+                      onClick={handleGenerateScriptV2}
                       disabled={isGenerating}
                     >
                       {isGenerating ? "Generating..." : "Generate"}
