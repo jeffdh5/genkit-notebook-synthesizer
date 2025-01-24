@@ -1,16 +1,13 @@
 "use client";
 import * as React from 'react';
 import { NotebookDetailClient } from "./NotebookDetail";
+import { use } from 'react';
 
-type Params = {
-  params: {
-    id: string;
-  };
-}
+type Params = Promise<{ id: string }>
 
-function NotebookDetailPage({ params }: { params: React.Usable<{ id: string }> }) {
-  // asynchronous access of `params.id`.
-  const { id } = React.use(params);
+function NotebookDetailPage({ params }: { params: Params }) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
   return <NotebookDetailClient id={id} />;
 }
 

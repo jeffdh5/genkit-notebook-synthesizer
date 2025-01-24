@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -15,3 +16,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const functions = getFunctions(getApp());
+
+if (process.env.NEXT_PUBLIC_USE_FUNCTIONS_EMULATOR === 'true') {
+  connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+}

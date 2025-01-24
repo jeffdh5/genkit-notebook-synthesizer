@@ -1,41 +1,12 @@
-'use server';
-
-import { genkit, z } from "genkit";
-import { googleAI } from "@genkit-ai/googleai";
-import { gemini15Flash } from "@genkit-ai/googleai";
-import textToSpeech from "@google-cloud/text-to-speech";
+import { z } from "genkit";
 import fs from "fs/promises";
 import ffmpeg from "fluent-ffmpeg";
 import path from "path";
-import admin from "firebase-admin";
-import dotenv from "dotenv";
 import { v4 as uuidv4 } from 'uuid';
+import { ai, bucket, tts } from "./config";
+import { gemini15Flash } from "@genkit-ai/googleai";
 
-dotenv.config();
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  });
-}
-
-const firebaseAdmin = admin.app();
-
-const ai = genkit({
-  plugins: [googleAI()],
-  model: gemini15Flash,
-});
-
-// Use the singleton getter instead of direct initialization
-const bucket = firebaseAdmin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
-console.log('Bucket:', bucket.name);
-
-async function uploadFileToStorage(filePath: string, destination: string) {
+async function uploadFileToStorage(bucket: any, filePath: string, destination: string) {
   await bucket.upload(filePath, {
     destination,
     metadata: {
@@ -258,7 +229,7 @@ export const synthesizeAudioFlow = ai.defineFlow(
   async (inputValues) => {
     const { scriptSections } = inputValues;
     const outputFileName = `podcast_audio_${Date.now()}.mp3`;
-    const storageUrl = await synthesizePodcastAudio(scriptSections, outputFileName);
+    const storageUrl = await synthesizePodcastAudio(scriptSections, bucket, outputFileName);
     return { audioFileName: outputFileName, storageUrl };
   }
 );
@@ -317,6 +288,8 @@ enum AudioEncoding {
   PCM = "PCM",
 }
 
+
+
 /**
  * This function loops through each line of the final podcast script,
  * synthesizes the audio for each line, and writes out separate mp3 segments.
@@ -324,10 +297,10 @@ enum AudioEncoding {
  */
 export async function synthesizePodcastAudio(
   scriptSections: PodcastScriptSection[],
-  outputFileName = ""
+  bucket: any,
+  outputFileName = "",
 ) {
   console.log('Starting audio synthesis for', scriptSections.length, 'sections');
-  const client = new textToSpeech.TextToSpeechClient();
   const segmentFiles: string[] = [];
   let segmentIndex = 0;
 
@@ -351,7 +324,7 @@ export async function synthesizePodcastAudio(
           },
         };
         
-        const [response] = await client.synthesizeSpeech(request);
+        const [response] = await tts.synthesizeSpeech(request);
         
         if (!response.audioContent) {
           throw new Error("No audio content received from Text-to-Speech API");
@@ -373,11 +346,11 @@ export async function synthesizePodcastAudio(
     console.log('Uploading merged file to storage...');
     const finalOutputFileName = outputFileName || `${uuidv4()}.mp3`;
     const uniqueFileName = `podcasts/${finalOutputFileName}`;
-    await uploadFileToStorage(finalOutputFileName, uniqueFileName);
+    await uploadFileToStorage(bucket, finalOutputFileName, uniqueFileName);
     console.log('Successfully uploaded merged file to storage');
 
     console.log('Generating shareable download URL...');
-    const gsUrl = `gs://${process.env.FIREBASE_STORAGE_BUCKET}/${uniqueFileName}`;
+    const gsUrl = `gs://${process.env.FB_ADMIN_STORAGE_BUCKET}/${uniqueFileName}`;
     console.log('Generated Google Storage URL:', gsUrl);
 
     console.log('Cleaning up temporary files...');

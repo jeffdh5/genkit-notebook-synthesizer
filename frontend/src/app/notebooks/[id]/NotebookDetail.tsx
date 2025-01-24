@@ -18,8 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { generatePodcastV2 } from "@/app/genkit/actions";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 
 interface NotebookDetailClientProps {
@@ -27,6 +27,16 @@ interface NotebookDetailClientProps {
 }
 
 const MAX_SOURCES = 300;
+
+interface ScriptSection {
+  title: string;
+  content: string;
+}
+
+interface GeneratePodcastResponse {
+  scriptSections: ScriptSection[];
+  storageUrl: string;
+}
 
 export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
   const [title, setTitle] = useState("");
@@ -137,13 +147,16 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
 
       const sourceText = sources.join("\n\n");
 
-      const result = await generatePodcastV2({ sourceText });
-      setScriptSections(result.scriptSections);
+      const functions = getFunctions();
+      const generatePodcast = httpsCallable(functions, 'generatePodcast');
+      const result = await generatePodcast({ sourceText });
+      const data = result.data as GeneratePodcastResponse;
+      //setScriptSections(data.scriptSections);
       
       // Get the signed URL for the audio file
-      if (result.storageUrl) {
+      if (data.storageUrl) {
         const storage = getStorage();
-        const audioRef = ref(storage, result.storageUrl);
+        const audioRef = ref(storage, data.storageUrl);
         const url = await getDownloadURL(audioRef);
         setAudioUrl(url);
       }
