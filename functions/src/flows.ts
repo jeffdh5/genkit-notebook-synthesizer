@@ -302,13 +302,12 @@ export async function synthesizePodcastAudio(
 ) {
   console.log('Starting audio synthesis for', scriptSections.length, 'sections');
   const segmentFiles: string[] = [];
-  let segmentIndex = 0;
 
   try {
-    // Generate individual MP3 segments
-    for (const section of scriptSections) {
-      console.log(`Processing section for speaker: ${section.speaker}, lines: ${section.lines.length}`);
-      for (const line of section.lines) {
+    // Generate all MP3 segments in parallel
+    const synthesisPromises = scriptSections.flatMap((section, sectionIndex) => 
+      section.lines.map(async (line, lineIndex) => {
+        const segmentIndex = sectionIndex * 1000 + lineIndex; // Unique index for each segment
         console.log(`Synthesizing audio for segment ${segmentIndex}`);
         const request = {
           input: { text: line },
@@ -334,10 +333,11 @@ export async function synthesizePodcastAudio(
         console.log(`Writing audio content to file: ${segmentFileName}`);
         await fs.writeFile(segmentFileName, response.audioContent, "binary");
         console.log(`Successfully wrote audio content to file: ${segmentFileName}`);
-        segmentFiles.push(segmentFileName);
-        segmentIndex++;
-      }
-    }
+        return segmentFileName;
+      })
+    );
+
+    const segmentFiles = await Promise.all(synthesisPromises);
 
     console.log('Merging', segmentFiles.length, 'audio segments...');
     await mergeAudioFiles(segmentFiles, outputFileName);
