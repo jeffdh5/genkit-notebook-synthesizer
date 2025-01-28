@@ -257,18 +257,29 @@ export const endToEndPodcastFlow = ai.defineFlow(
     outputSchema: endToEndPodcastOutputSchema,
   },
   async (input) => {
+    const startTime = Date.now();
+    let timer = Date.now();
+
     const { summary, quotesBlock, outlineBlock } = 
       await summarizeSourceFlow(input);
+    console.log(`Summarize flow: ${Date.now() - timer}ms`);
+    timer = Date.now();
 
     const { hooks } = 
       await discussionHooksFlow({ summary, quotesBlock, outlineBlock });
+    console.log(`Hooks flow: ${Date.now() - timer}ms`);
+    timer = Date.now();
 
     const { scriptSections } = 
       await finalPodcastScriptFlow({ summary, quotesBlock, outlineBlock, hooks });
+    console.log(`Script flow: ${Date.now() - timer}ms`);
+    timer = Date.now();
 
     const { audioFileName, storageUrl } = 
       await synthesizeAudioFlow({ scriptSections });
-
+    console.log(`Audio synthesis: ${Date.now() - timer}ms`);
+    
+    console.log(`Total time: ${Date.now() - startTime}ms`);
     return { audioFileName, scriptSections, storageUrl };
   }
 );
@@ -302,42 +313,75 @@ export async function synthesizePodcastAudio(
 ) {
   console.log('Starting audio synthesis for', scriptSections.length, 'sections');
   const segmentFiles: string[] = [];
+  const concurrency = 3; // Reduced from 10 to 3
+  const startTime = Date.now();
+
+  // Add retry helper function
+  const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delayMs = 1000): Promise<T> => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (retries > 0) {
+        console.log(`Retrying... attempts left: ${retries}`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        return withRetry(fn, retries - 1, delayMs * 2); // Exponential backoff
+      }
+      throw error;
+    }
+  };
 
   try {
-    // Generate all MP3 segments in parallel
-    const synthesisPromises = scriptSections.flatMap((section, sectionIndex) => 
-      section.lines.map(async (line, lineIndex) => {
-        const segmentIndex = sectionIndex * 1000 + lineIndex; // Unique index for each segment
-        console.log(`Synthesizing audio for segment ${segmentIndex}`);
-        const request = {
-          input: { text: line },
-          voice: {
-            languageCode: "en-US",
-            name: section.speaker === "Alex" ? "en-US-Journey-D" : "en-US-Journey-F",
-          },
-          audioConfig: {
-            audioEncoding: AudioEncoding.LINEAR16,
-            effectsProfileId: ["small-bluetooth-speaker-class-device"],
-            pitch: 0,
-            speakingRate: 1,
-          },
-        };
-        
-        const [response] = await tts.synthesizeSpeech(request);
-        
-        if (!response.audioContent) {
-          throw new Error("No audio content received from Text-to-Speech API");
-        }
-        
-        const segmentFileName = `segment_${segmentIndex}_${section.speaker}.mp3`;
-        console.log(`Writing audio content to file: ${segmentFileName}`);
-        await fs.writeFile(segmentFileName, response.audioContent, "binary");
-        console.log(`Successfully wrote audio content to file: ${segmentFileName}`);
-        return segmentFileName;
-      })
+    // Process sections in parallel with limited concurrency
+    const batchPromises = [];
+    const allSegments = scriptSections.flatMap((section, sectionIndex) => 
+      section.lines.map((line, lineIndex) => ({
+        section, line, segmentIndex: sectionIndex * 1000 + lineIndex
+      }))
     );
 
-    const segmentFiles = await Promise.all(synthesisPromises);
+    while (allSegments.length > 0) {
+      const batch = allSegments.splice(0, concurrency);
+      batchPromises.push(
+        Promise.all(batch.map(async ({ section, line, segmentIndex }) => {
+          const segmentStart = Date.now();
+          const segmentFileName = `segment_${segmentIndex}_${section.speaker}.mp3`;
+          
+          // Wrap API call with retry
+          await withRetry(async () => {
+            console.log(`Synthesizing audio for segment ${segmentIndex}`);
+            const [response] = await tts.synthesizeSpeech({
+              input: { text: line },
+              voice: {
+                languageCode: "en-US",
+                name: section.speaker === "Alex" ? "en-US-Journey-D" : "en-US-Journey-F",
+              },
+              audioConfig: {
+                audioEncoding: AudioEncoding.MP3,
+                effectsProfileId: ["small-bluetooth-speaker-class-device"],
+                pitch: 0,
+                speakingRate: 1,
+              },
+            });
+            
+            if (!response.audioContent) {
+              throw new Error("No audio content received");
+            }
+            
+            await fs.writeFile(segmentFileName, response.audioContent, "binary");
+          });
+
+          console.log(`Segment ${segmentIndex} processed in ${Date.now() - segmentStart}ms`);
+          return segmentFileName;
+        }))
+      );
+
+      // Add delay between batches
+      if (allSegments.length > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+      }
+    }
+
+    const segmentFiles = (await Promise.all(batchPromises)).flat();
 
     console.log('Merging', segmentFiles.length, 'audio segments...');
     await mergeAudioFiles(segmentFiles, outputFileName);
@@ -365,6 +409,8 @@ export async function synthesizePodcastAudio(
       console.warn("Could not remove merged file:", outputFileName, err)
     );
     console.log('Cleanup complete');
+
+    console.log(`Total audio processing time: ${Date.now() - startTime}ms`);
     return gsUrl;
   } catch (error) {
     console.error('Error during audio synthesis:', error);

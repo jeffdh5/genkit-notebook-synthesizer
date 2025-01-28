@@ -38,17 +38,17 @@ GOOGLE_UNIVERSE_DOMAIN=googleapis.com
 
 1. Navigate to the NextJS application directory and initiate the frontend:
 ```bash
-cd frontend/; npm run dev
+cd frontend; npm run dev
 ```
 
 2. In a separate terminal, start Genkit with TypeScript watch mode:
 ```bash
-npx genkit start -- npx tsx --watch functions/src/flows.ts
+cd functions; npx genkit start -- npx tsx --watch src/flows.ts
 ```
 
 3. Launch the Firebase emulator:
 ```bash
-cd functions; firebase emulators:start --only=functions
+firebase emulators:start --only=functions
 ```
 
 ## Local Development Flow
