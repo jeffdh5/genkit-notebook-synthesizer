@@ -1,6 +1,8 @@
 # Open-Source NotebookLM Starter Kit  
 
-Build your own NotebookLM-style application with our ready-to-use starter kit.  
+Build your own NotebookLM-style application with our ready-to-use starter kit.
+
+See a hosted demo of a NotebookLM clone, developed using this project: https://webapp--smarthome-d6e27.us-central1.hosted.app/
 
 ## What’s Included?  
 - **AI-powered synthesis utilities** – Convert diverse input sources (**links, YouTube videos, text**) into structured, consumable formats like **podcasts, debates, FAQs, and study guides**.  
