@@ -34,6 +34,10 @@ export const firebaseAdmin = admin.app();
 export const bucket = firebaseAdmin.storage().bucket(FB_ADMIN_STORAGE_BUCKET);
 logger.info('Bucket initialized', { bucketName: bucket.name });
 
+// Initialize Firestore
+export const db = firebaseAdmin.firestore();
+logger.info('Firestore initialized');
+
 // Replace the credentials.json loading with environment variables
 const googleAuthConfig = {
   type: process.env.GOOGLE_AUTH_TYPE || 'service_account',

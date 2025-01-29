@@ -38,6 +38,14 @@ interface GeneratePodcastResponse {
   storageUrl: string;
 }
 
+interface PodcastJob {
+  status: string;
+  audioOutput?: {
+    storageUrl: string;
+  };
+  currentStep?: string;
+}
+
 export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
   const [title, setTitle] = useState("");
   const [sources, setSources] = useState<Array<{ id: string; title: string; content: string }>>([]);
@@ -50,6 +58,8 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
   const [scriptSections, setScriptSections] = useState<Array<{ speaker: string; lines: string[] }>>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [jobStatus, setJobStatus] = useState<PodcastJob | null>(null);
 
   useEffect(() => {
     if (!id || Array.isArray(id)) return;
@@ -150,22 +160,35 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
       const functions = getFunctions();
       const generatePodcast = httpsCallable(functions, 'generatePodcast');
       const result = await generatePodcast({ sourceText });
-      const data = result.data as GeneratePodcastResponse;
-      //setScriptSections(data.scriptSections);
+      const data = result.data as any;
+      console.log(data);
       
-      // Get the signed URL for the audio file
-      if (data.storageUrl) {
-        const storage = getStorage();
-        const audioRef = ref(storage, data.storageUrl);
-        const url = await getDownloadURL(audioRef);
-        setAudioUrl(url);
-      }
+      // Save the jobId
+      setJobId(data.jobId);
       
-      console.log(result);
+      // Add a listener for changes in the podcast job status
+      const jobRef = doc(db, "podcastJobs", data.jobId);
+      const unsubscribe = onSnapshot(jobRef, async (doc) => {
+        const jobData = doc.data() as PodcastJob | undefined;
+        console.log(jobData);
+        setJobStatus(jobData || null);
+        if (jobData?.status === 'COMPLETED' && jobData.audioOutput?.storageUrl) {
+          const storage = getStorage();
+          const storageRef = ref(storage, jobData.audioOutput.storageUrl);
+          try {
+            const url = await getDownloadURL(storageRef);
+            console.log(url);
+            setAudioUrl(url);
+            setIsGenerating(false);
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+            setIsGenerating(false);
+          }
+          unsubscribe(); // Stop listening once the job is completed
+        }
+      });
     } catch (error) {
       console.error('Error generating script:', error);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -416,8 +439,25 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
                       </audio>
                     </div>
                   )}
+                  {(jobStatus?.status === 'QUEUED' || jobStatus?.status === 'PROCESSING') && (
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
+                        <span className="text-sm text-muted-foreground">
+                          {jobStatus.currentStep ? (
+                            <span className="capitalize">
+                              {jobStatus.currentStep.toLowerCase().replace(/_/g, ' ')}...
+                            </span>
+                          ) : (
+                            'Preparing podcast...'
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               </div>
+
 
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-muted-foreground">Notes</h3>
@@ -459,6 +499,7 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
                 <Button variant="outline" size="sm" className="hover:bg-accent">Briefing doc</Button>
                 <Button variant="outline" size="sm" className="hover:bg-accent">Timeline</Button>
               </div>
+
             </CardContent>
           </Card>
         </div>

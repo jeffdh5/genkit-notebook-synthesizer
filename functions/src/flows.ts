@@ -5,6 +5,7 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 import { ai, bucket, tts } from "./config";
 import { gemini15Flash } from "@genkit-ai/googleai";
+import * as admin from "firebase-admin";
 
 async function uploadFileToStorage(bucket: any, filePath: string, destination: string) {
   await bucket.upload(filePath, {
@@ -237,6 +238,7 @@ export const synthesizeAudioFlow = ai.defineFlow(
 // Optional: End-to-end Flow
 const endToEndPodcastInputSchema = z.object({
   sourceText: z.string(),
+  jobId: z.string(),
 });
 
 const endToEndPodcastOutputSchema = z.object({
@@ -250,6 +252,39 @@ const endToEndPodcastOutputSchema = z.object({
   storageUrl: z.string(),
 });
 
+type StepStatus = 'summarizing' | 'generating_hooks' | 'generating_script' | 'synthesizing_audio' | 'completed';
+type JobStatus = 'PROCESSING' | 'COMPLETED' | 'ERROR';
+
+interface PodcastJobDocument {
+  status: JobStatus;
+  currentStep: StepStatus;
+  summarizeCompleted: boolean;
+  hooksCompleted: boolean;
+  scriptCompleted: boolean;
+  audioCompleted: boolean;
+  summaryOutput?: {
+    summary: string;
+    quotesBlock: string;
+    outlineBlock: string;
+  };
+  hooksOutput?: {
+    hooks: string[];
+  };
+  scriptOutput?: {
+    scriptSections: Array<{
+      speaker: "Alex" | "Jamie";
+      lines: string[];
+    }>;
+  };
+  audioOutput?: {
+    audioFileName: string;
+    storageUrl: string;
+  };
+  metrics?: Record<string, number>;
+  error?: string;
+  completedAt?: admin.firestore.Timestamp;
+}
+
 export const endToEndPodcastFlow = ai.defineFlow(
   {
     name: "endToEndPodcastFlow",
@@ -257,30 +292,84 @@ export const endToEndPodcastFlow = ai.defineFlow(
     outputSchema: endToEndPodcastOutputSchema,
   },
   async (input) => {
-    const startTime = Date.now();
     let timer = Date.now();
+    const metrics: Record<string, number> = {};
+    const jobRef = admin.firestore().collection('podcastJobs').doc(input.jobId);
 
-    const { summary, quotesBlock, outlineBlock } = 
-      await summarizeSourceFlow(input);
-    console.log(`Summarize flow: ${Date.now() - timer}ms`);
-    timer = Date.now();
+    // Update initial status
+    const initialUpdate: Partial<PodcastJobDocument> = {
+      status: 'PROCESSING',
+      currentStep: 'summarizing',
+      summarizeCompleted: false,
+      hooksCompleted: false,
+      scriptCompleted: false,
+      audioCompleted: false,
+    };
+    await jobRef.update(initialUpdate);
 
-    const { hooks } = 
-      await discussionHooksFlow({ summary, quotesBlock, outlineBlock });
-    console.log(`Hooks flow: ${Date.now() - timer}ms`);
-    timer = Date.now();
+    try {
+      // Step 1: Summarize
+      const summaryResult = await summarizeSourceFlow({ sourceText: input.sourceText });
+      metrics.summarize = Date.now() - timer;
+      await jobRef.update({ 
+        summarizeCompleted: true,
+        summaryOutput: summaryResult,
+        currentStep: 'generating_hooks'
+      });
+      timer = Date.now();
 
-    const { scriptSections } = 
-      await finalPodcastScriptFlow({ summary, quotesBlock, outlineBlock, hooks });
-    console.log(`Script flow: ${Date.now() - timer}ms`);
-    timer = Date.now();
+      // Step 2: Generate hooks
+      const hooksResult = await discussionHooksFlow(summaryResult);
+      metrics.hooks = Date.now() - timer;
+      await jobRef.update({ 
+        hooksCompleted: true,
+        hooksOutput: hooksResult,
+        currentStep: 'generating_script'
+      });
+      timer = Date.now();
 
-    const { audioFileName, storageUrl } = 
-      await synthesizeAudioFlow({ scriptSections });
-    console.log(`Audio synthesis: ${Date.now() - timer}ms`);
-    
-    console.log(`Total time: ${Date.now() - startTime}ms`);
-    return { audioFileName, scriptSections, storageUrl };
+      // Step 3: Generate script
+      const scriptResult = await finalPodcastScriptFlow({ 
+        ...summaryResult, 
+        ...hooksResult 
+      });
+      metrics.script = Date.now() - timer;
+      await jobRef.update({ 
+        scriptCompleted: true,
+        scriptOutput: scriptResult,
+        currentStep: 'synthesizing_audio'
+      });
+      timer = Date.now();
+
+      // Step 4: Synthesize audio
+      const audioResult = await synthesizeAudioFlow(scriptResult);
+      metrics.audio = Date.now() - timer;
+      await jobRef.update({ 
+        audioCompleted: true,
+        audioOutput: audioResult
+      });
+
+      // Update final success state
+      await jobRef.update({
+        status: 'COMPLETED',
+        //currentStep: admin.firestore.FieldValue.delete(),
+        currentStep: '', // todo use admin delete field
+        metrics,
+      });
+
+      return { 
+        audioFileName: audioResult.audioFileName, 
+        scriptSections: scriptResult.scriptSections, 
+        storageUrl: audioResult.storageUrl 
+      };
+    } catch (error) {
+      // Update error state
+      await jobRef.update({
+        status: 'ERROR',
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 );
 
@@ -313,8 +402,20 @@ export async function synthesizePodcastAudio(
 ) {
   console.log('Starting audio synthesis for', scriptSections.length, 'sections');
   const segmentFiles: string[] = [];
-  const concurrency = 3; // Reduced from 10 to 3
+  const concurrency = 3;
   const startTime = Date.now();
+  const synthesisMetrics = {
+    totalSegments: 0,
+    avgSegmentTime: 0,
+    mergeTime: 0,
+    uploadTime: 0,
+    retries: 0,
+  };
+
+  // Add line count metrics
+  const totalLines = scriptSections.reduce((acc, sec) => acc + sec.lines.length, 0);
+  synthesisMetrics.totalSegments = totalLines;
+  console.log(`Total lines to synthesize: ${totalLines}`);
 
   // Add retry helper function
   const withRetry = async <T>(fn: () => Promise<T>, retries = 3, delayMs = 1000): Promise<T> => {
@@ -370,7 +471,8 @@ export async function synthesizePodcastAudio(
             await fs.writeFile(segmentFileName, response.audioContent, "binary");
           });
 
-          console.log(`Segment ${segmentIndex} processed in ${Date.now() - segmentStart}ms`);
+          const segmentTime = Date.now() - segmentStart;
+          synthesisMetrics.avgSegmentTime = (synthesisMetrics.avgSegmentTime * (segmentIndex) + segmentTime) / (segmentIndex + 1);
           return segmentFileName;
         }))
       );
@@ -384,14 +486,16 @@ export async function synthesizePodcastAudio(
     const segmentFiles = (await Promise.all(batchPromises)).flat();
 
     console.log('Merging', segmentFiles.length, 'audio segments...');
+    const mergeStart = Date.now();
     await mergeAudioFiles(segmentFiles, outputFileName);
-    console.log('Successfully merged audio files');
-
+    synthesisMetrics.mergeTime = Date.now() - mergeStart;
+    
     console.log('Uploading merged file to storage...');
+    const uploadStart = Date.now();
     const finalOutputFileName = outputFileName || `${uuidv4()}.mp3`;
     const uniqueFileName = `podcasts/${finalOutputFileName}`;
     await uploadFileToStorage(bucket, finalOutputFileName, uniqueFileName);
-    console.log('Successfully uploaded merged file to storage');
+    synthesisMetrics.uploadTime = Date.now() - uploadStart;
 
     console.log('Generating shareable download URL...');
     const gsUrl = `gs://${process.env.FB_ADMIN_STORAGE_BUCKET}/${uniqueFileName}`;
@@ -410,7 +514,15 @@ export async function synthesizePodcastAudio(
     );
     console.log('Cleanup complete');
 
-    console.log(`Total audio processing time: ${Date.now() - startTime}ms`);
+    // Add audio synthesis metrics
+    console.log('\n=== Audio Synthesis Metrics ===');
+    console.log(`Total segments processed: ${synthesisMetrics.totalSegments}`);
+    console.log(`Average segment time: ${synthesisMetrics.avgSegmentTime.toFixed(1)}ms`);
+    console.log(`Merge time: ${synthesisMetrics.mergeTime}ms`);
+    console.log(`Upload time: ${synthesisMetrics.uploadTime}ms`);
+    console.log(`Retry attempts: ${synthesisMetrics.retries}`);
+    console.log(`Total audio processing time: ${Date.now() - startTime}ms\n`);
+
     return gsUrl;
   } catch (error) {
     console.error('Error during audio synthesis:', error);

@@ -41,12 +41,17 @@ GOOGLE_UNIVERSE_DOMAIN=googleapis.com
 cd frontend; npm run dev
 ```
 
-2. In a separate terminal, start Genkit with TypeScript watch mode:
+2. In a separate terminal, start Genkit Dev UI + Flows Server with TypeScript watch mode:
 ```bash
 cd functions; npx genkit start -- npx tsx --watch src/flows.ts
 ```
 
-3. Launch the Firebase emulator:
+3. In a separate terminal, run the build command in watch mode for Functions emulator to automatically pick up new changes: 
+```bash
+npm run build:watch
+```
+
+4. In a separate terminal, launch the Firebase emulator:
 ```bash
 firebase emulators:start --only=functions
 ```
