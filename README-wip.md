@@ -11,8 +11,8 @@ Get started quickly, customize as needed, and bring AI-powered research synthesi
 
 ## Key Features  
 - **Prebuilt AI Pipelines** – Summarization, Q&A, podcast scripts, structured reports  
-- **Multi-Format Outputs** – Get text, structured JSON, or AI-generated audio scripts  
-- **Multi-Agent AI Synthesis** – Generate interactive discussions (e.g., AI scientist debates AI journalist)  
+- **Multi-Format Outputs** – Synthesize your raw input sources into podcasts, debates, FAQs, and more note formats  
+- **Multi-Agent AI Synthesis** – Generate interactive discussions that highlight disparate viewpoints (e.g., AI scientist debates AI journalist)  
 - **Firebase & Serverless-Friendly** – Deploy easily on Firebase, Google Cloud, or run locally  
 - **Extensible & Customizable** – Swap LLMs, tweak synthesis logic, and extend with your own transformations  
 
