@@ -17,37 +17,6 @@ async function uploadFileToStorage(bucket: any, filePath: string, destination: s
   console.log(`${filePath} uploaded to ${destination}`);
 }
 
-// FOR DEMO PURPOSES
-export const multiStepPodcastFlow = ai.defineFlow(
-  {
-    name: "multiStepPodcastFlow",
-    inputSchema: z.object({
-      pdfPath: z.string()
-        .describe("The path to a PDF file")
-        .default("example.pdf"),
-    }),
-    outputSchema: z.object({
-      scriptSections: z.array(z.object({
-        speaker: z.string(),
-        lines: z.array(z.string()),
-      })),
-    }),
-  },
-  async (input) => {
-    const { text } = await ai.generate({
-      model: gemini15Flash,
-      prompt: `Create a detailed podcast script based on the content of the PDF located at ${input.pdfPath}.`,
-    });
-    return {
-      scriptSections: [
-        {
-          speaker: "AI",
-          lines: [text],
-        },
-      ],
-    };
-  }
-); 
 // Flow #1: Summarize Source
 const summarizeSourceInputSchema = z.object({
   sourceText: z.string(),
