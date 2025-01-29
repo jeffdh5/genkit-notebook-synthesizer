@@ -21,6 +21,7 @@ Get started quickly, customize as needed, and bring AI-powered research synthesi
 ### 1. Install  
 ```sh
 npm install genkit-synthesis-starter
+```
 
 ### 2. Transform Content
 ```ts
