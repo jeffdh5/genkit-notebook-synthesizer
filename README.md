@@ -36,25 +36,11 @@ GOOGLE_UNIVERSE_DOMAIN=googleapis.com
 
 ## Development Setup
 
-1. Navigate to the NextJS application directory and initiate the frontend:
-```bash
-cd frontend; npm run dev
-```
-
-2. In a separate terminal, start Genkit Dev UI + Flows Server with TypeScript watch mode:
-```bash
-cd functions; npx genkit start -- npx tsx --watch src/flows.ts
-```
-
-3. In a separate terminal, run the build command in watch mode for Functions emulator to automatically pick up new changes: 
-```bash
-npm run build:watch
-```
-
-4. In a separate terminal, launch the Firebase emulator:
-```bash
-firebase emulators:start --only=functions
-```
+1. Install dependencies in both the frontend and functions directories:
+   ```bash
+   cd frontend/; npm install
+   cd ../functions/; npm install
+   ```
 
 ## Local Development Flow
 
@@ -65,13 +51,14 @@ When developing locally, the frontend application can be configured to point to 
    - This allows you to test your functions locally without deploying them to Firebase.
    - To start the emulator, run the following command in the `functions` directory:
      ```bash
-     cd functions; firebase emulators:start --only=functions
+     firebase emulators:start --only=functions
      ```
 
 2. **Using Deployed Cloud Functions:**
    - If `NEXT_PUBLIC_USE_FUNCTIONS_EMULATOR=false` or the variable is not set, the frontend will point to the deployed callable Cloud Function in your Firebase project.
    - This is useful for testing the integration with the live environment.
    - Ensure that your Cloud Function `generatePodcast` is deployed and accessible.
+   - You may run into a CORS issue; please add `allUsers` as a principal on the Cloud Function and add the `Cloud Run Invoker` role inside Google Cloud Console.
 
 ### Steps to Run the Development Environment:
 
