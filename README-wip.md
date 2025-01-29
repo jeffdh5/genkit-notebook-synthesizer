@@ -1,11 +1,18 @@
-# AI Synthesis Starter  
+# Open-Source NotebookLM Starter Kit
 Build AI-powered content transformation apps—like NotebookLM, but customizable. Powered by [genkit](https://firebase.google.com/docs/genkit)
 
 ## What is this?  
-GenKit Synthesis Starter is an open-source AI synthesis toolkit that helps developers build NotebookLM-style applications with GenKit. It provides plug-and-play AI pipelines for transforming documents into summaries, podcasts, structured Q&A, and more.  
+NotebookLM Starter Kit is an open-source AI synthesis toolkit that helps developers build NotebookLM-style applications with GenKit. It provides plug-and-play AI pipelines for transforming documents into summaries, podcasts, structured Q&A, and more. 
+
+Comes with a NotebookLM-inspired NextJS webapp, which you can use as a starting point for your next project, or simply as a sample to understand how to use the toolkit effectively.
 
 ## Why Use This?  
-LLMs are powerful, but structuring their outputs is hard. Instead of stitching together RAG, retrieval, and synthesis manually, this toolkit gives you ready-made AI workflows for content transformation.  
+LLMs are powerful at generating and synthesizing content, however any LLM-powered content generation tool needs a few things:
+- Access to input in various formats
+- Tools to chunk, store, and retrieve relevant subsets of content
+- Workflows that massage LLM output into content digestible by a human
+
+Instead of stitching together RAG, retrieval, and synthesis manually, this toolkit gives you ready-made AI workflows for content transformation.  
 
 ## Key Features  
 - Prebuilt AI Pipelines – Summarization, Q&A, podcast scripts, structured reports  
