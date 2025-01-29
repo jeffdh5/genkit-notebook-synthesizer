@@ -49,12 +49,8 @@ export const generatePodcast = onCall(async (request) => {
       sourceText,
       status: 'QUEUED',
     });
-    logger.info("000")
-
     const queue = getFunctions().taskQueue("processPodcastGeneration");
-    logger.info("111")
     const targetUri = await getFunctionUrl("processPodcastGeneration");
-    logger.info("Task to enqueue", { jobId: jobRef.id, targetUri });
     await queue.enqueue(
       { sourceText, jobId: jobRef.id },
       {
@@ -62,7 +58,6 @@ export const generatePodcast = onCall(async (request) => {
         uri: targetUri,
       }
     );
-
     return { 
       jobId: jobRef.id,
       status: "queued", 
