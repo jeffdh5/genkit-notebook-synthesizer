@@ -4,7 +4,7 @@ Build your own NotebookLM-style application with our ready-to-use starter kit.
 
 ## What’s Included?  
 - **AI-powered synthesis utilities** – Convert diverse input sources (**links, YouTube videos, text**) into structured, consumable formats like **podcasts, debates, FAQs, and study guides**.  
-- **Serverless backend (Cloud Run)** – Deploy a fully functional API in **5 minutes**, accessible via HTTP.  
+- **Serverless backend (Cloud Run)** – Comes with a fully functional API for synthesizing content that you can deploy in **5 minutes**, accessible via HTTP. Uses Firestore and Cloud Tasks to execute the synthesis logic as a background job.
 - **Next.js boilerplate UI** – A customizable frontend to help you **build your own NotebookLM-inspired experience**.  
 
 Get started quickly, customize as needed, and bring AI-powered research synthesis to your own applications.  
@@ -14,7 +14,7 @@ Get started quickly, customize as needed, and bring AI-powered research synthesi
 - **Multi-Format Outputs** – Synthesize your raw input sources into podcasts, debates, FAQs, and more note formats  
 - **Multi-Agent AI Synthesis** – Generate interactive discussions that highlight disparate viewpoints (e.g., AI scientist debates AI journalist)  
 - **Firebase & Serverless-Friendly** – Deploy easily on Firebase, Google Cloud, or run locally  
-- **Extensible & Customizable** – Swap LLMs, tweak synthesis logic, and extend with your own transformations  
+- **Extensible & Customizable** – Swap LLMs, tweak synthesis logic, and extend with your own transformations by following the existing pattern
 
 ## Get Started  
 
