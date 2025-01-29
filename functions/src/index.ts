@@ -6,7 +6,7 @@ import { endToEndPodcastFlow } from "./flows";
 import { GoogleAuth } from "google-auth-library";
 import { db } from "./config";
 
-const IS_EMULATOR = true;  // Toggle this for local development
+const IS_EMULATOR = false;  // Toggle this for local development
 
 // Helper function to get the function URL
 async function getFunctionUrl(name: string, location = "us-central1") {
@@ -51,11 +51,7 @@ export const generatePodcast = onCall(async (request) => {
     });
     logger.info("000")
 
-    const queue = getFunctions().taskQueue(
-      IS_EMULATOR 
-        ? "processPodcastGeneration"
-        : "us-central1-processPodcastGeneration"
-    );
+    const queue = getFunctions().taskQueue("processPodcastGeneration");
     logger.info("111")
     const targetUri = await getFunctionUrl("processPodcastGeneration");
     logger.info("Task to enqueue", { jobId: jobRef.id, targetUri });
