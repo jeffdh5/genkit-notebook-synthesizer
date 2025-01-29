@@ -1,5 +1,5 @@
-# GenKit Synthesis Starter  
-Build AI-powered content transformation apps—like NotebookLM, but customizable.  
+# AI Synthesis Starter  
+Build AI-powered content transformation apps—like NotebookLM, but customizable. Powered by [genkit](https://firebase.google.com/docs/genkit)
 
 ## What is this?  
 GenKit Synthesis Starter is an open-source AI synthesis toolkit that helps developers build NotebookLM-style applications with GenKit. It provides plug-and-play AI pipelines for transforming documents into summaries, podcasts, structured Q&A, and more.  
