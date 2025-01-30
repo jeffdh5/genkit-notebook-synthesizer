@@ -1,11 +1,7 @@
 export type OutputType =
   | "summary"
   | "study_guide"
-  | "FAQ"
-  | "briefing_doc"
-  | "timeline"
-  | "podcast"
-  | "debate";
+  | "podcast";
 
 /**
  * Summary Options
