@@ -1,27 +1,58 @@
-# GenKit Synthesis Starter  
-Build AI-powered content transformation apps—like NotebookLM, but customizable.  
+# Open-Source NotebookLM Starter Kit  
 
-## What is this?  
-GenKit Synthesis Starter is an open-source AI synthesis toolkit that helps developers build NotebookLM-style applications with GenKit. It provides plug-and-play AI pipelines for transforming documents into summaries, podcasts, structured Q&A, and more.  
+Build your own NotebookLM-style application with our ready-to-use starter kit.
 
-## Why Use This?  
-LLMs are powerful, but structuring their outputs is hard. Instead of stitching together RAG, retrieval, and synthesis manually, this toolkit gives you ready-made AI workflows for content transformation.  
+See a hosted demo of a NotebookLM clone, developed using this project: https://webapp--smarthome-d6e27.us-central1.hosted.app/notebooks (click into one of the pre-existing notebooks and click `Generate`)
+
+## What’s Included?  
+- **AI-powered synthesis utilities** – Convert diverse input sources (**links, YouTube videos, text**) into structured, consumable formats like **podcasts, debates, FAQs, and study guides**. (Available as `npm` package but source code lives here)
+- **Serverless backend (Cloud Run)** – Comes with a fully functional API for synthesizing content that you can deploy in **5 minutes**, accessible via HTTP. Uses Firestore and Cloud Tasks to execute the synthesis logic as a background job.
+- **Next.js boilerplate UI** – A customizable frontend to help you **build your own NotebookLM-inspired experience**. Easily deployable to both Firebase App Hosting and Vercel.
+
+Get started quickly, customize as needed, and bring AI-powered research synthesis to your own applications.  
 
 ## Key Features  
-- Prebuilt AI Pipelines – Summarization, Q&A, podcast scripts, structured reports  
-- Multi-Format Outputs – Get text, structured JSON, or AI-generated audio scripts  
-- Multi-Agent AI Synthesis – Generate interactive discussions (e.g., AI scientist debates AI journalist)  
-- Firebase & Serverless-Friendly – Deploy easily on Firebase, Google Cloud, or run locally  
-- Extensible & Customizable – Swap LLMs, tweak synthesis logic, and extend with your own transformations  
+- **Prebuilt AI Pipelines** – Summarization, Q&A, podcast scripts, structured reports  
+- **Multi-Format Outputs** – Synthesize your raw input sources into podcasts, debates, FAQs, and more note formats  
+- **Multi-Agent AI Synthesis** – Generate interactive discussions that highlight disparate viewpoints (e.g., AI scientist debates AI journalist)  
+- **Firebase & Serverless-Friendly** – Deploy easily on Firebase, Google Cloud, or run locally  
+- **Extensible & Customizable** – Swap LLMs, tweak synthesis logic, and extend with your own transformations by following the existing pattern
+
+## Who is This For?  
+
+This starter kit is designed for **developers, startups, and researchers** looking to integrate **AI-powered content synthesis** into their applications without building everything from scratch.  
+
+### Ideal Users  
+
+✅ **Indie AI SaaS Builders**  
+- Want to build AI-powered **research tools, study assistants, or content transformation apps.**  
+- Need a **structured AI pipeline** that can synthesize **long-form content into digestible formats (FAQs, podcasts, debates).**  
+- Looking for a **Firebase-friendly** solution to deploy quickly.  
+
+✅ **Developers Building AI-Powered Knowledge Tools**  
+- Want to **extract insights from documents, links, and transcripts.**  
+- Need a **prebuilt synthesis engine** that supports **summarization, Q&A, and structured notes.**  
+- Prefer **a modular, extendable AI pipeline** rather than writing everything manually.  
+
+✅ **Researchers & Educators**  
+- Need to **generate study guides, structured notes, and educational podcasts** from existing materials.  
+- Want a way to **organize and synthesize research papers, transcripts, and other content into useful outputs.**  
+- Looking for **an open-source AI-powered NotebookLM alternative** that they can customize.  
+
+✅ **Startups & Companies Experimenting with AI**  
+- Want to **quickly prototype AI-powered document processing and knowledge assistants.**  
+- Need **a modular system** that allows swapping in **different LLMs and synthesis logic** based on business needs.  
+- Prefer a **serverless, Firebase-compatible backend** that scales without DevOps overhead.  
 
 ## Get Started  
 
 ### 1. Install  
-```bash
+```sh
 npm install genkit-synthesis-starter
 ```
-### 2. Transform Content 
-```bash
+
+### 2. Transform Content
+```ts
 import { synthesize } from "genkit-synthesis-starter";
 
 const result = synthesize({
@@ -33,35 +64,16 @@ console.log(result.summary);  // Key takeaways
 console.log(result.podcast);  // AI-generated podcast script
 console.log(result.qa);       // AI-generated questions for further exploration
 ```
-
-### 3. Customize Your Pipelines
-```bash
+### 3. Customize Pipelines
+```ts
 synthesize({
   input: "research_paper.txt",
-  format: "debate",
-  agents: ["AI Scientist", "AI Journalist"],
+  output: "debate",
+  options: {
+    agents: ["AI Scientist", "AI Journalist"]
+  }
 });
 ```
+This generates a structured discussion between AI personas debating different perspectives.
 
-Result: Generates a structured discussion between AI personas debating different perspectives.
 
-## How It Works
-- Ingests Content → Supports text, PDFs, and structured notes
-- Synthesizes Insights → Converts raw input into summaries, Q&A, debates, or structured reports
-- Outputs in Multiple Formats → JSON, markdown, text, audio-friendly scripts
-- Powered by GenKit, it runs seamlessly with Firebase AI, Google Cloud, and Gemini models
-
-## Use Cases
-- NotebookLM-style AI assistants – Build your own AI-powered knowledge tool
-- Automated podcast generators – Convert articles into AI-driven discussions  
-- AI research assistants – Extract key insights & generate structured summaries
-- AI-powered customer support – Auto-generate responses & FAQs from documentation
-
-## Extending & Customizing
-- Use different LLMs – Works with Gemini, OpenAI, or self-hosted models
-- Modify synthesis pipelines – Adjust summarization logic, Q&A structure, or output formats
-- Deploy anywhere – Firebase, Google Cloud Functions, or self-hosted
-
-## Roadmap & Future Enhancements
-- Initial release with summarization, Q&A, podcast generation
-- Coming soon: Multi-document synthesis, better agent interactions, Firebase-ready hosting
