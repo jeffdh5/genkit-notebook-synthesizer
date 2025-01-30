@@ -94,7 +94,7 @@ synthesize({
 ```
 
 ### **4. Formal Debate with Moderator **
-```
+```typescript
 synthesize({
   input: "ai_ethics_whitepaper.txt",
   output: "podcast",
@@ -119,7 +119,7 @@ synthesize({
 ```
 
 ### **5. Trend Analysis Podcast (Casual roundtable) **
-```
+```typescript
 synthesize({
   input: "tech_trends_2025.txt",
   output: "podcast",
