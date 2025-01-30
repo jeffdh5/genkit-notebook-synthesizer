@@ -71,7 +71,7 @@ synthesize({
 });
 ```
 
-### **3. Roundtable Podcast **
+### **3. Moderated Roundtable Podcast **
 
 ```typescript
 synthesize({
@@ -114,6 +114,31 @@ synthesize({
       { sideName: "Against AI Regulation", speakers: ["Mark Davis"], keyPoints: ["Innovation freedom", "Economic growth"] }
     ],
     moderator: { name: "James Smith", gender: "male", style: "neutral", openingRemarks: true }
+  }
+});
+```
+
+### **4b. Casual Debate - open format **
+
+```typescript
+synthesize({
+  input: "ai_ethics_whitepaper.txt",
+  output: "podcast",
+  options: {
+    format: "debate",
+    speakers: [
+      { name: "Alice Johnson", role: "panelist", gender: "female" },
+      { name: "Mark Davis", role: "panelist", gender: "male" }
+    ],
+    duration: 40,
+    debateTopic: "Should AI Be Regulated?",
+    debateStructure: "open",
+    numRounds: 3,
+    autoAssignSides: false,
+    sides: [
+      { sideName: "Pro AI Regulation", speakers: ["Alice Johnson"], keyPoints: ["Ethical concerns", "Bias risks"] },
+      { sideName: "Against AI Regulation", speakers: ["Mark Davis"], keyPoints: ["Innovation freedom", "Economic growth"] }
+    ],
   }
 });
 ```
