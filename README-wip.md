@@ -44,7 +44,7 @@ This starter kit is designed for **developers, startups, and researchers** looki
 - Need **a modular system** that allows swapping in **different LLMs and synthesis logic** based on business needs.  
 - Prefer a **serverless, Firebase-compatible backend** that scales without DevOps overhead.  
 
-## Get Started  
+## Get Started (to be updated - see types.ts for latest real configuration)
 
 ### 1. Install  
 ```sh
