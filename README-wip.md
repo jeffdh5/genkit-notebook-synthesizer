@@ -51,29 +51,114 @@ This starter kit is designed for **developers, startups, and researchers** looki
 npm install genkit-synthesis-starter
 ```
 
-### 2. Transform Content
-```ts
-import { synthesize } from "genkit-synthesis-starter";
-
-const result = synthesize({
-  input: "path/to/article.pdf",
-  output: ["summary", "podcast", "Q&A"],
-});
-
-console.log(result.summary);  // Key takeaways
-console.log(result.podcast);  // AI-generated podcast script
-console.log(result.qa);       // AI-generated questions for further exploration
-```
-### 3. Customize Pipelines
-```ts
+### **2. Interview Podcast **
+```typescript
 synthesize({
-  input: "research_paper.txt",
-  output: "debate",
+  input: "ai_healthcare_research.txt",
+  output: "podcast",
   options: {
-    agents: ["AI Scientist", "AI Journalist"]
+    format: "interview",
+    speakers: [
+      { name: "John Doe", role: "host", gender: "male" },
+      { name: "Dr. Emily Carter", role: "guest", gender: "female" }
+    ],
+    duration: 30,
+    intervieweeName: "Dr. Emily Carter",
+    topic: "The Future of AI in Healthcare",
+    interviewStyle: "scripted",
+    maxQuestions: 10
   }
 });
 ```
-This generates a structured discussion between AI personas debating different perspectives.
 
+### **3. Moderated Roundtable Podcast **
 
+```typescript
+synthesize({
+  input: "crypto_market_analysis.txt",
+  output: "podcast",
+  options: {
+    format: "roundtable",
+    speakers: [
+      { name: "Lisa Tran", role: "moderator", gender: "female" },
+      { name: "David Kim", role: "expert", gender: "male" },
+      { name: "Sophia Lee", role: "expert", gender: "female" }
+    ],
+    duration: 45,
+    discussionStyle: "expert_panel",
+    structure: "moderated_topics",
+    includeModerator: true,
+    maxSpeakerTime: 5
+  }
+});
+```
+
+### **4. Formal Debate with Moderator **
+```typescript
+synthesize({
+  input: "ai_ethics_whitepaper.txt",
+  output: "podcast",
+  options: {
+    format: "debate",
+    speakers: [
+      { name: "Alice Johnson", role: "panelist", gender: "female" },
+      { name: "Mark Davis", role: "panelist", gender: "male" }
+    ],
+    duration: 40,
+    debateTopic: "Should AI Be Regulated?",
+    debateStructure: "formal",
+    numRounds: 3,
+    autoAssignSides: false,
+    sides: [
+      { sideName: "Pro AI Regulation", speakers: ["Alice Johnson"], keyPoints: ["Ethical concerns", "Bias risks"] },
+      { sideName: "Against AI Regulation", speakers: ["Mark Davis"], keyPoints: ["Innovation freedom", "Economic growth"] }
+    ],
+    moderator: { name: "James Smith", gender: "male", style: "neutral", openingRemarks: true }
+  }
+});
+```
+
+### **4b. Casual Debate - open format **
+
+```typescript
+synthesize({
+  input: "ai_ethics_whitepaper.txt",
+  output: "podcast",
+  options: {
+    format: "debate",
+    speakers: [
+      { name: "Alice Johnson", role: "panelist", gender: "female" },
+      { name: "Mark Davis", role: "panelist", gender: "male" }
+    ],
+    duration: 40,
+    debateTopic: "Should AI Be Regulated?",
+    debateStructure: "open",
+    numRounds: 3,
+    autoAssignSides: false,
+    sides: [
+      { sideName: "Pro AI Regulation", speakers: ["Alice Johnson"], keyPoints: ["Ethical concerns", "Bias risks"] },
+      { sideName: "Against AI Regulation", speakers: ["Mark Davis"], keyPoints: ["Innovation freedom", "Economic growth"] }
+    ],
+  }
+});
+```
+
+### **5. Trend Analysis Podcast (Casual roundtable) **
+```typescript
+synthesize({
+  input: "tech_trends_2025.txt",
+  output: "podcast",
+  options: {
+    format: "roundtable",
+    speakers: [
+      { name: "Ethan Patel", role: "host", gender: "male" },
+      { name: "Mia Sanchez", role: "guest", gender: "female" }
+    ],
+    duration: 20,
+    discussionStyle: "trend_analysis",
+    structure: "open_discussion",
+    includeModerator: false,
+    maxSpeakerTime: 7
+  }
+});
+```
