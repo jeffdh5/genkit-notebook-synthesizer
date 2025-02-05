@@ -3,21 +3,14 @@ import textToSpeech from "@google-cloud/text-to-speech";
 import { genkit } from "genkit";
 import { googleAI } from "@genkit-ai/googleai";
 import { gemini15Flash } from "@genkit-ai/googleai";
-import * as logger from "firebase-functions/logger";
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const PROJECT_ID = process.env.PROJECT_ID;
-const FB_ADMIN_CLIENT_EMAIL = process.env.FB_ADMIN_CLIENT_EMAIL;
-const FB_ADMIN_PRIVATE_KEY = process.env.FB_ADMIN_PRIVATE_KEY;
-const FB_ADMIN_STORAGE_BUCKET = process.env.FB_ADMIN_STORAGE_BUCKET;
-
-logger.info("Environment Variables", {
-  PROJECT_ID,
-  FB_ADMIN_CLIENT_EMAIL,
-  FB_ADMIN_STORAGE_BUCKET,
-});
+export const PROJECT_ID = process.env.PROJECT_ID;
+export const FB_ADMIN_CLIENT_EMAIL = process.env.FB_ADMIN_CLIENT_EMAIL;
+export const FB_ADMIN_PRIVATE_KEY = process.env.FB_ADMIN_PRIVATE_KEY;
+export const FB_ADMIN_STORAGE_BUCKET = process.env.FB_ADMIN_STORAGE_BUCKET;
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -31,12 +24,10 @@ if (!admin.apps.length) {
 }
 
 export const firebaseAdmin = admin.app();
-export const bucket = firebaseAdmin.storage().bucket(FB_ADMIN_STORAGE_BUCKET);
-logger.info('Bucket initialized', { bucketName: bucket.name });
+export const storage = firebaseAdmin.storage();
 
 // Initialize Firestore
 export const db = firebaseAdmin.firestore();
-logger.info('Firestore initialized');
 
 // Replace the credentials.json loading with environment variables
 const googleAuthConfig = {
@@ -52,7 +43,6 @@ const googleAuthConfig = {
   client_x509_cert_url: process.env.GOOGLE_CLIENT_CERT_URL,
 };
 
-// Initialize Text-to-Speech Client with credentials from credentials.json
 export const tts = new textToSpeech.TextToSpeechClient(googleAuthConfig);
 
 export const ai = genkit({

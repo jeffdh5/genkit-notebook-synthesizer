@@ -5,6 +5,7 @@ import { getFunctions } from "firebase-admin/functions";
 import { endToEndPodcastFlow } from "./flows";
 import { GoogleAuth } from "google-auth-library";
 import { db } from "./config";
+import { PodcastOptions } from "./types";
 
 const IS_EMULATOR = false;  // Toggle this for local development
 
@@ -68,7 +69,6 @@ export const generatePodcast = onCall(async (request) => {
     throw new Error(`Failed to start podcast generation: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
-
 // Function to process the actual podcast generation
 export const processPodcastGeneration = onTaskDispatched(
   {
@@ -80,14 +80,18 @@ export const processPodcastGeneration = onTaskDispatched(
       maxConcurrentDispatches: 5,
     },
   },
-  async (req) => {
-    const sourceText = req.data.sourceText;
+  async (req: { data: { sourceTexts: string[], jobId: string, options: PodcastOptions } }) => {
+    const sourceTexts = req.data.sourceTexts;
     const jobId = req.data.jobId;
+    const options = req.data.options;
     logger.info("Processing podcast generation task", { structuredData: true });
-
     try {
-      const result = await endToEndPodcastFlow({ jobId, sourceText });
-      logger.info("Podcast generation completed successfully", { result });
+      if (options.format === "roundtable") {
+        const result = await endToEndPodcastFlow({ jobId, sourceTexts, options });
+        logger.info("Podcast generation completed successfully", { result });
+      } else {
+        throw("Podcast option not supported.");
+      }
     } catch (error) {
       logger.error("Error generating podcast", { error });
       throw error;
