@@ -1,6 +1,6 @@
-# Open-Source NotebookLM Starter Kit  
+# Open-Source NotebookLM Sample 
 
-Build your own NotebookLM-style application with our ready-to-use starter kit.
+Build your own NotebookLM-style application using this sample as a starting point.
 
 See a hosted demo of a NotebookLM clone, developed using this project: https://webapp--smarthome-d6e27.us-central1.hosted.app/notebooks (click into one of the pre-existing notebooks and click `Generate`)
 
@@ -58,10 +58,9 @@ Get started quickly, customize as needed, and bring AI-powered research synthesi
 
 ## Key Features  
 - **Prebuilt AI Pipelines** – Summarization, Q&A, podcast scripts, structured reports  
-- **Multi-Format Outputs** – Synthesize your raw input sources into podcasts, debates, FAQs, and more note formats  
-- **Multi-Agent AI Synthesis** – Generate interactive discussions that highlight disparate viewpoints (e.g., AI scientist debates AI journalist)  
-- **Firebase & Serverless-Friendly** – Deploy easily on Firebase, Google Cloud, or run locally  
-- **Extensible & Customizable** – Swap LLMs, tweak synthesis logic, and extend with your own transformations by following the existing pattern
+- **Multi-Format Outputs** – Synthesize your raw input sources into different engaging formats
+- **Firebase & Serverless-Friendly** – Deploy easily on Firebase/Cloud Run or run locally  
+- **Extensible & Customizable** – Use this as a starting point and customize the pipeline to your own needs - this is a boilerplate / sample meant to be iterated on
 
 ## Who is This For?  
 
