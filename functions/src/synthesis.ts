@@ -1,6 +1,7 @@
 import { PodcastOptions, SynthesisRequest, SynthesisResult, PodcastResult } from './types';
 //import { generateSummary } from './flows/summaryOLD';
 import { endToEndPodcastFlow } from './flows';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function synthesize(request: SynthesisRequest): Promise<SynthesisResult> {
   console.log("REQ", JSON.stringify(request, null, 2));
@@ -20,7 +21,7 @@ export async function synthesize(request: SynthesisRequest): Promise<SynthesisRe
 
 async function generatePodcast(input: string | string[], options: PodcastOptions): Promise<PodcastResult> {
   // Generate a unique job ID for tracking this podcast generation
-  const jobId = `podcast_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `podcast_${uuidv4()}`;
 
   // Convert input to array if single string
   const sourceTexts = Array.isArray(input) ? input : [input];

@@ -5,9 +5,9 @@ Build your own NotebookLM-style application with our ready-to-use starter kit.
 See a hosted demo of a NotebookLM clone, developed using this project: https://webapp--smarthome-d6e27.us-central1.hosted.app/notebooks (click into one of the pre-existing notebooks and click `Generate`)
 
 ## What's Included?  
-- **AI-powered synthesis utilities** – Convert diverse input sources (**links, YouTube videos, text**) into structured, consumable formats like **podcasts, debates, FAQs, and study guides**. (Available as `npm` package but source code lives here)
-- **Serverless backend (Cloud Run)** – Comes with a fully functional API for synthesizing content that you can deploy in **5 minutes**, accessible via HTTP. Uses Firestore and Cloud Tasks to execute the synthesis logic as a background job.
-- **Next.js boilerplate UI** – A customizable frontend to help you **build your own NotebookLM-inspired experience**. Easily deployable to both Firebase App Hosting and Vercel.
+- **AI-powered synthesis utilities** – Out-of-the-box utilities for converting diverse input sources (**PDFs**, **text**, and more coming soon) into structured, consumable audio formats like **roundtable discussions, formal debates, and expert interviews**. (Available as `npm` package but source code lives here). This codebase is meant to be used as a starting point for your own customizable pipelines.
+- **Serverless backend (Cloud Run)** – Built to deploy on Cloud Run, so you can easily spin up a Serverless API that your frontends can consume.
+- **Next.js boilerplate UI** – So that you can build your own NotebookLM-inspired experience. Easily deployable to Firebase App Hosting.
 
 Get started quickly, customize as needed, and bring AI-powered research synthesis to your own applications.  
 
@@ -54,7 +54,7 @@ Before getting started, you'll need:
    - Search for "Cloud Text-to-Speech API"
    - Click "Enable"
 
-2. **Get a PaLM API Key**
+2. **Get a Makersuite API Key**
    - Visit [Google AI Studio](https://makersuite.google.com)
    - Click "Get API Key" in the top right
    - Create a new API key or use an existing one
@@ -69,7 +69,7 @@ Before getting started, you'll need:
 ## Quickstart
 Here's how can you can quickly get started and see your first podcast uploaded to Cloud Storage:
 
-1. 
+1. Create a .env file:
 ```bash
 vim functions/.env
 ```
@@ -90,7 +90,18 @@ ts-node src/scripts/testPodcastTemplates.ts
 For detailed setup instructions, please see [setup.md](setup.md).
 
 ## Usage
-You can easily 
+You can easily generate AI-powered podcasts from any text content by configuring the synthesis options. The system is flexible and can handle various podcast formats including:
+
+1. One-on-one interviews
+2. Multi-speaker roundtables 
+3. Moderated panel discussions
+4. And more...
+
+To generate a podcast:
+
+1. Create a podcast configuration object defining your desired format and speakers (see examples below)
+2. Prepare your input text (can be a PDF, string, or array of strings)
+3. Call the synthesis function:
 
 ```
 // Roundtable podcast
@@ -129,6 +140,11 @@ export const simpleRoundtableConfig = {
 };
 ```
 
+
+The above example shows a roundtable discussion format with multiple expert speakers and a moderator. The configuration specifies speaker backgrounds, voice IDs for text-to-speech, discussion style, and storage locations for the generated content.
+
+Below is an example of a one-on-one interview format, where a tech reporter interviews an AI researcher:
+
 ```
 // Interview podcast
 // Tech reporter interviewing an AI Reseracher
@@ -156,6 +172,10 @@ export const simpleInterviewConfig = {
   audioStorage: "audio"
 };
 ```
+
+The above example demonstrates a simple interview format with two speakers, where a tech reporter conducts a focused interview with an AI researcher. The configuration includes speaker details, interview style preferences, and topic focus.
+
+Below is an example of an ethical debate format, which facilitates a structured discussion between two experts with opposing viewpoints on AI development:
 
 ```
 export const ethicalDebateConfig = {
@@ -208,3 +228,4 @@ export const ethicalDebateConfig = {
   audioStorage: "audio"
 }; 
 ```
+> **Note**: For detailed configuration schemas and options for each podcast format, see the TypeScript interfaces in `src/schemas/*.ts`
