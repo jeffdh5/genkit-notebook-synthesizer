@@ -57,8 +57,7 @@ For detailed setup instructions, please see [setup.md](setup.md).
 Get started quickly, customize as needed, and bring AI-powered research synthesis to your own applications.  
 
 ## Key Features  
-- **Prebuilt AI Pipelines** – Summarization, Q&A, podcast scripts, structured reports  
-- **Multi-Format Outputs** – Synthesize your raw input sources into different engaging formats
+- **AI-Powered Audio Generation** – Pre-built pipelines that use LLMs to turn your raw notes and sources into consumable audio content (podcasts - interviews, debates, roundtables)
 - **Firebase & Serverless-Friendly** – Deploy easily on Firebase/Cloud Run or run locally  
 - **Extensible & Customizable** – Use this as a starting point and customize the pipeline to your own needs - this is a boilerplate / sample meant to be iterated on
 
