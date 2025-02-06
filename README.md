@@ -139,10 +139,9 @@ export const simpleRoundtableConfig = {
 };
 ```
 
+This example configures a roundtable discussion with multiple speakers, a moderator, and storage settings.
 
-The above example shows a roundtable discussion format with multiple expert speakers and a moderator. The configuration specifies speaker backgrounds, voice IDs for text-to-speech, discussion style, and storage locations for the generated content.
-
-Below is an example of a one-on-one interview format, where a tech reporter interviews an AI researcher:
+Here's an interview format example:
 
 ```
 // Interview podcast
@@ -171,10 +170,9 @@ export const simpleInterviewConfig = {
   audioStorage: "audio"
 };
 ```
+This example shows an interview format where a tech reporter interviews an AI researcher.
 
-The above example demonstrates a simple interview format with two speakers, where a tech reporter conducts a focused interview with an AI researcher. The configuration includes speaker details, interview style preferences, and topic focus.
-
-Below is an example of an ethical debate format, which facilitates a structured discussion between two experts with opposing viewpoints on AI development:
+Here's a debate format example that structures a discussion between experts with opposing views:
 
 ```
 export const ethicalDebateConfig = {
