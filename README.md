@@ -50,7 +50,7 @@ ts-node src/scripts/testPodcastTemplates.ts
 For detailed setup instructions, please see [setup.md](setup.md).
 
 ## What's Included?  
-- **AI-powered synthesis utilities** – Out-of-the-box utilities for converting diverse input sources (**PDFs**, **text**, and more coming soon) into structured, consumable audio formats like **roundtable discussions, formal debates, and expert interviews**. (Available as `npm` package but source code lives here). This codebase is meant to be used as a starting point for your own customizable pipelines.
+- **AI-powered synthesis utilities** – Out-of-the-box utilities for converting diverse input sources (PDFs, text, and more coming soon) into structured, consumable audio formats like roundtable discussions, formal debates, and expert interviews. This codebase is meant to be used as a starting point for your own customizable pipelines.
 - **Serverless backend (Cloud Run)** – Built to deploy on Cloud Run, so you can easily spin up a Serverless API that your frontends can consume.
 - **Next.js boilerplate UI** – So that you can build your own NotebookLM-inspired experience. Easily deployable to Firebase App Hosting.
 
