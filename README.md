@@ -70,24 +70,24 @@ This starter kit is designed for **developers, startups, and researchers** looki
 ### Ideal Users  
 
 ✅ **Indie AI SaaS Builders**  
-- Want to build AI-powered **research tools, study assistants, or content transformation apps.**  
-- Need a **structured AI pipeline** that can synthesize **long-form content into digestible formats (FAQs, podcasts, debates).**  
-- Looking for a **Firebase-friendly** solution to deploy quickly.  
+- Want to build AI-powered **podcast generation tools** that create engaging roundtables, interviews, and debates.
+- Looking to expand into other **engaging content formats** like interactive FAQs and study guides.
+- Need a **Firebase-friendly** solution to deploy quickly.
 
-✅ **Developers Building AI-Powered Knowledge Tools**  
-- Want to **extract insights from documents, links, and transcripts.**  
-- Need a **prebuilt synthesis engine** that supports **summarization, Q&A, and structured notes.**  
-- Prefer **a modular, extendable AI pipeline** rather than writing everything manually.  
+✅ **Developers Building AI-Powered Content Tools**  
+- Want to transform documents and transcripts into **engaging audio discussions and structured learning materials.**
+- Need a **prebuilt pipeline** for generating natural-sounding podcasts, with plans to support other interactive formats.
+- Prefer **a modular, extendable system** rather than writing everything manually.
 
 ✅ **Researchers & Educators**  
-- Need to **generate study guides, structured notes, and educational podcasts** from existing materials.  
-- Want a way to **organize and synthesize research papers, transcripts, and other content into useful outputs.**  
-- Looking for **an open-source AI-powered NotebookLM alternative** that they can customize.  
+- Need to **turn research papers and materials into engaging audio discussions** that students will actually consume.
+- Want to eventually support generating **interactive study guides and Q&A formats** that make learning more engaging.
+- Looking for **an open-source alternative to NotebookLM** that prioritizes engaging, multi-format content.
 
 ✅ **Startups & Companies Experimenting with AI**  
-- Want to **quickly prototype AI-powered document processing and knowledge assistants.**  
-- Need **a modular system** that allows swapping in **different LLMs and synthesis logic** based on business needs.  
-- Prefer a **serverless, Firebase-compatible backend** that scales without DevOps overhead.  
+- Want to **quickly prototype AI podcast generation** with plans to expand into other engaging content formats.
+- Need **a flexible system** that allows customizing voices, discussion styles, and content formats.
+- Prefer a **serverless, Firebase-compatible backend** that scales without DevOps overhead.
 
 ## Detailed Usage
 You can easily generate AI-powered podcasts from any text content by configuring the synthesis options. The system is flexible and can handle various podcast formats including:
