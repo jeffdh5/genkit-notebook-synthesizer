@@ -1,7 +1,7 @@
 import { z } from "genkit";
-import { interviewPodcastOptionsSchema } from "./schemas/formats/interview";
-import { roundtablePodcastOptionsSchema } from "./schemas/formats/roundtable";
-import { debatePodcastOptionsSchema } from "./schemas/formats/debate";
+import { interviewPodcastOptionsSchema } from "./formats/interview";
+import { roundtablePodcastOptionsSchema } from "./formats/roundtable";
+import { debatePodcastOptionsSchema } from "./formats/debate";
 
 // Defines a discriminated union of podcast format options, using the "format" field as the discriminator.
 // This allows type-safe handling of the different podcast formats (interview, roundtable, debate)
@@ -54,46 +54,3 @@ export enum JobStatus {
   COMPLETED = 'COMPLETED',
   ERROR = 'ERROR'
 }
-
-/**
- * Summary Options
- * Generates a condensed version of the input text
- */
-/*
-export interface SummaryOptions {
-  maxWords: number;
-  style: "bullet_points" | "paragraph";
-}
-*/
-
-/*
-interface PodcastJobDocument {
-  status: JobStatus;
-  currentStep: StepStatus;
-  summarizeCompleted: boolean;
-  hooksCompleted: boolean;
-  scriptCompleted: boolean;
-  audioCompleted: boolean;
-  summaryOutput?: {
-    summary: string;
-    quotesBlock: string;
-    outlineBlock: string;
-  };
-  hooksOutput?: {
-    hooks: string[];
-  };
-  scriptOutput?: {
-    scriptSections: Array<{
-      speaker: "Alex" | "Jamie";
-      lines: string[];
-    }>;
-  };
-  audioOutput?: {
-    audioFileName: string;
-    storageUrl: string;
-  };
-  metrics?: Record<string, number>;
-  error?: string;
-  completedAt?: admin.firestore.Timestamp;
-}
-*/

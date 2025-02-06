@@ -1,6 +1,6 @@
 import { z } from "genkit";
 import { ai, db, JOBS_COLLECTION } from "./config";
-import { JobStatus, podcastOptionsSchema } from "./types";
+import { JobStatus, podcastOptionsSchema } from "./schemas/podcast";
 import { summarizeSourcesFlow } from "./flows/summarizeSource";
 import { synthesizeAudioFlow } from "./flows/synthesizeAudio";
 import { discussionHooksFlow } from "./flows/generateHooks";

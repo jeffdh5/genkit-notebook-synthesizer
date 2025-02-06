@@ -4,7 +4,7 @@ import { onTaskDispatched } from "firebase-functions/v2/tasks";
 import { getFunctions } from "firebase-admin/functions";
 import { endToEndPodcastFlow } from "./flows";
 import { db, JOBS_COLLECTION } from "./config";
-import { JobStatus, PodcastOptions, SynthesisRequest } from "./types";
+import { JobStatus, PodcastOptions, SynthesisRequest } from "./schemas/podcast";
 import { synthesize } from "./synthesis";
 import { getFunctionUrl } from "./util";
 

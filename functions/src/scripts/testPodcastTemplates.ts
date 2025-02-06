@@ -7,7 +7,7 @@ import {
   ethicalDebateConfig,
   startupRoundtableConfig,
   panelInterviewConfig
-} from '../configs/podcast-templates';
+} from '../podcast-templates';
 
 async function generatePodcastFromTemplate(
   pdfText: string, 

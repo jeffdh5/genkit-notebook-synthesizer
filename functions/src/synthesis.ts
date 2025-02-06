@@ -1,7 +1,8 @@
-import { PodcastOptions, SynthesisRequest, SynthesisResult, PodcastResult } from './types';
 //import { generateSummary } from './flows/summaryOLD';
 import { endToEndPodcastFlow } from './flows';
 import { v4 as uuidv4 } from 'uuid';
+import { SynthesisRequest, SynthesisResult, PodcastOptions, PodcastResult } from './schemas/podcast';
+
 
 export async function synthesize(request: SynthesisRequest): Promise<SynthesisResult> {
   console.log("REQ", JSON.stringify(request, null, 2));
