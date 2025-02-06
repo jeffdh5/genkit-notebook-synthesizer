@@ -2,8 +2,6 @@
 
 Build your own NotebookLM-style application using this sample as a starting point.
 
-See a hosted demo of a NotebookLM clone, developed using this project: https://webapp--smarthome-d6e27.us-central1.hosted.app/notebooks (click into one of the pre-existing notebooks and click `Generate`)
-
 ## Prerequisites
 Before getting started, you'll need:
 
