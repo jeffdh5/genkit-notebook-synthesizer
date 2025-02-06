@@ -1,19 +1,14 @@
-import { StudyGuideOptions, PodcastOptions, SynthesisRequest, SynthesisResult, StudyGuideSection } from './types';
-import { generateSummary } from './flows/summaryOLD';
+import { PodcastOptions, SynthesisRequest, SynthesisResult, PodcastResult } from './types';
+//import { generateSummary } from './flows/summaryOLD';
+import { endToEndPodcastFlow } from './flows';
 
 export async function synthesize(request: SynthesisRequest): Promise<SynthesisResult> {
+  console.log("REQ", JSON.stringify(request, null, 2));
   const results: SynthesisResult = {};
   
   for (const output of request.output) {
     switch (output.type) {
-      case 'summary':
-        results.summary = await generateSummary({input: request.input, options: output.options});
-        break;
-      
-      case 'study_guide':
-        results.studyGuide = await generateStudyGuide(request.input, output.options);
-        break;
-      
+      // in the future, support additional types
       case 'podcast':
         results.podcast = await generatePodcast(request.input, output.options);
         break;
@@ -23,11 +18,21 @@ export async function synthesize(request: SynthesisRequest): Promise<SynthesisRe
   return results;
 }
 
-async function generateStudyGuide(input: string | string[], options: StudyGuideOptions): Promise<StudyGuideSection[]> {
-  // Implementation for study guide generation
-}
-
 async function generatePodcast(input: string | string[], options: PodcastOptions): Promise<PodcastResult> {
-  // Implementation for podcast generation
-  // Would need to handle different podcast formats (interview, roundtable, debate)
+  // Generate a unique job ID for tracking this podcast generation
+  const jobId = `podcast_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  // Convert input to array if single string
+  const sourceTexts = Array.isArray(input) ? input : [input];
+
+  // Call the end-to-end podcast generation flow
+  const result = await endToEndPodcastFlow({
+    sourceTexts,
+    jobId,
+    options
+  });
+
+  return {
+    transcript: JSON.stringify(result.script),
+  };
 }

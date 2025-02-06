@@ -1,47 +1,20 @@
 import { z } from "genkit";
-import { basePodcastOptionsSchema } from "../../types";
 import { ai } from "../../config";
-import * as admin from "firebase-admin";
 import { gemini15Flash } from "@genkit-ai/googleai";
+import { interviewPodcastOptionsSchema } from "../../schemas/formats/interview";
 
-export const interviewPodcastOptionsSchema = basePodcastOptionsSchema.extend({
-    format: z.literal("interview"),
-    
-    // The guest being interviewed. AI will frame the interview around this speaker.
-    // If omitted, AI picks the most relevant guest from `speakers[]`.
-    intervieweeName: z.string().optional(),
-    
-    // The topic or guiding question for the interview.
-    // If omitted, AI infers a topic based on input content.
-    topic: z.string().optional(),
-    
-    // Defines how structured the interview should be:
-    // - "scripted" → AI follows predefined questions
-    // - "freeform" → AI asks dynamic, conversation-style questions
-    interviewStyle: z.enum(["scripted", "freeform"]).optional(),
-    
-    // If true, multiple interviewers take turns asking questions.
-    // If false, the first "host" in `speakers[]` is the only interviewer.
-    rotatingInterviewers: z.boolean().optional(),
-    
-    // Max number of questions in the interview.
-    // Defaults to 10 if unspecified.
-    // Min: 3, Max: 20
-    maxQuestions: z.number().min(3).max(20).optional()
-  });
 
 const finalPodcastScriptInputSchema = z.object({
   summary: z.string(),
   hooks: z.array(z.string()),
-  options: interviewPodcastOptionsSchema,
-  jobId: z.string()
+  options: interviewPodcastOptionsSchema
 });
 
 const finalPodcastScriptOutputSchema = z.object({
-  scriptSections: z.array(
+  script: z.array(
     z.object({
       speaker: z.string(),
-      lines: z.array(z.string()),
+      text: z.string(),
     })
   ),
 });
@@ -53,9 +26,7 @@ export const interviewPodcastScriptFlow = ai.defineFlow(
     outputSchema: finalPodcastScriptOutputSchema,
   },
   async (inputValues) => {
-    const { summary, hooks, options, jobId } = inputValues;
-    const jobRef = admin.firestore().collection('podcastJobs').doc(jobId);
-    await jobRef.update({currentStep: 'generating_script'});
+    const { summary, hooks, options } = inputValues;
 
     const speakerIntros = options.speakers.map(speaker => 
       speaker.background ? 
@@ -110,9 +81,7 @@ export const interviewPodcastScriptFlow = ai.defineFlow(
       output: { schema: finalPodcastScriptOutputSchema },
     });
 
-    const scriptSections = scriptResponse.output?.scriptSections || [];
-    await jobRef.update({scriptCompleted: true});
-
-    return { scriptSections };
+    const script = scriptResponse.output?.script || [];
+    return { script };
   }
 );

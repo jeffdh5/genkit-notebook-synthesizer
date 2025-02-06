@@ -1,11 +1,9 @@
 import { gemini15Flash } from "@genkit-ai/googleai";
 import { ai } from "../config";
 import { z } from "genkit";
-import * as admin from "firebase-admin";
 
 const discussionHooksInputSchema = z.object({
-  summary: z.string(),
-  jobId: z.string()
+  summary: z.string()
 });
 
 const discussionHooksOutputSchema = z.object({
@@ -19,9 +17,7 @@ export const discussionHooksFlow = ai.defineFlow(
     outputSchema: discussionHooksOutputSchema,
   },
   async (input) => {
-    const { jobId, summary } = input;
-    const jobRef = admin.firestore().collection('podcastJobs').doc(jobId);
-    await jobRef.update({currentStep: 'generating_hooks'});
+    const { summary } = input;
 
     const prompt = `
       Given the following summaries:
@@ -37,7 +33,6 @@ export const discussionHooksFlow = ai.defineFlow(
       config: { temperature: 0.7 },
       output: { schema: discussionHooksOutputSchema },
     });
-    await jobRef.update({hooksCompleted: true});
 
     const hooks = hookResponse.text
       .split(/\n/g)

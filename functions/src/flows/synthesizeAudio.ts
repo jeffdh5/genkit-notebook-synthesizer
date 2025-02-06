@@ -1,10 +1,14 @@
 import { z } from "genkit";
-import { ai, FB_ADMIN_STORAGE_BUCKET, storage, tts } from "../config";
-import { moderatorSchema, speakerSchema, podcastOptionsSchema } from "../types";
+import { ai, storage, tts } from "../config";
+import { podcastOptionsSchema } from "../types";
 import fs from "fs/promises";
 import ffmpeg from "fluent-ffmpeg";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { uploadFileToStorage } from "../util";
+import { moderatorSchema, speakerSchema } from "../schemas/base";
+
+const defaultVoiceId = "en-US-Journey-D"; // fallback voice
 
 type PodcastScriptLine = {
   speaker: string;
@@ -19,16 +23,6 @@ enum AudioEncoding {
   MULAW = "MULAW",
   ALAW = "ALAW",
   PCM = "PCM",
-}
-
-async function uploadFileToStorage(bucket: any, filePath: string, destination: string) {
-  await bucket.upload(filePath, {
-    destination,
-    metadata: {
-      cacheControl: 'public, max-age=31536000',
-    },
-  });
-  console.log(`${filePath} uploaded to ${destination}`);
 }
 
 const synthesizeAudioInputSchema = z.object({
@@ -48,8 +42,6 @@ const synthesizeAudioOutputSchema = z.object({
   storageUrl: z.string(),
 });
 
-const defaultVoiceId = "en-US-Journey-D"; // fallback voice
-
 function getVoiceIdForSpeaker(speakerName: string, speakers: z.infer<typeof speakerSchema>[], moderator?: z.infer<typeof moderatorSchema>): string {
   // First check if this is the moderator
   if (moderator && moderator.name === speakerName) {
@@ -68,12 +60,14 @@ export const synthesizeAudioFlow = ai.defineFlow(
   },
   async (inputValues) => {
     const { script, speakers, moderator, options } = inputValues;
-    const outputFileName = `podcast_audio_${uuidv4()}.mp3`;
+
+    const outputFileName = `podcast_audio_${options.title || uuidv4()}.mp3`;
     const storagePath = `${options.audioStorage}/${outputFileName}`;
     const bucketName = options.bucketName;
     const bucket = storage.bucket(bucketName);
     // TODO: passing bucket + bucketName might cause some issues. Because bucketName means we need to specialcase to handle defaults.
-    const storageUrl = await synthesizePodcastAudio(script, bucket, bucketName || FB_ADMIN_STORAGE_BUCKET || "", outputFileName, storagePath, speakers, moderator);
+    const storageUrl = await synthesizePodcastAudio(script, bucket, bucketName, outputFileName, storagePath, speakers, moderator);
+    
     return { audioFileName: outputFileName, storageUrl };
   }
 );
@@ -128,12 +122,12 @@ export async function synthesizePodcastAudio(
     
     await withRetry(async () => {
       console.log(`Synthesizing audio for segment ${segmentIndex}`);
+      // Get voice name and infer language code from speaker
+      const name = getVoiceIdForSpeaker(line.speaker, speakers, moderator);
+      const languageCode = name.split('-')[0] + '-' + name.split('-')[1];
       const [response] = await tts.synthesizeSpeech({
         input: { text: line.text },
-        voice: {
-          languageCode: "en-US",
-          name: getVoiceIdForSpeaker(line.speaker, speakers, moderator),
-        },
+        voice: {languageCode, name},
         audioConfig: {
           audioEncoding: AudioEncoding.MP3,
           effectsProfileId: ["small-bluetooth-speaker-class-device"],

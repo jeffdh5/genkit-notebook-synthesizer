@@ -3,52 +3,23 @@ import { onCall } from "firebase-functions/v2/https";
 import { onTaskDispatched } from "firebase-functions/v2/tasks";
 import { getFunctions } from "firebase-admin/functions";
 import { endToEndPodcastFlow } from "./flows";
-import { GoogleAuth } from "google-auth-library";
-import { db } from "./config";
-import { PodcastOptions } from "./types";
+import { db, JOBS_COLLECTION } from "./config";
+import { JobStatus, PodcastOptions, SynthesisRequest } from "./types";
+import { synthesize } from "./synthesis";
+import { getFunctionUrl } from "./util";
 
-const IS_EMULATOR = false;  // Toggle this for local development
-
-// Helper function to get the function URL
-async function getFunctionUrl(name: string, location = "us-central1") {
-  if (IS_EMULATOR) {
-    return `http://127.0.0.1:5001/smarthome-d6e27/${location}/${name}`;
-  }
-
-  const auth = new GoogleAuth({
-    scopes: "https://www.googleapis.com/auth/cloud-platform",
-  });
-  const projectId = await auth.getProjectId();
-  const url = `https://cloudfunctions.googleapis.com/v2beta/projects/${projectId}/locations/${location}/functions/${name}`;
-
-  const client = await auth.getClient();
-  interface FunctionResponse {
-    serviceConfig: { uri: string }
-  }
-  const res = await client.request<FunctionResponse>({ url });
-  const uri = res.data?.serviceConfig?.uri;
-  if (!uri) {
-    throw new Error(`Unable to retrieve uri for function at ${url}`);
-  }
-  return uri;
-}
 
 // Function to handle the initial request and enqueue the task
 export const generatePodcast = onCall(async (request) => {
   const sourceText = request.data.sourceText;
-  
-  if (!sourceText) {
-    throw new Error("Source text is required");
-  }
-  
+  if (!sourceText) { throw new Error("Source text is required") }
   logger.info("Enqueueing podcast generation task");
 
   try {
-    // Use db instead of admin.firestore()
-    const jobRef = db.collection('podcastJobs').doc();
+    const jobRef = db.collection(JOBS_COLLECTION).doc();
     await jobRef.set({
       sourceText,
-      status: 'QUEUED',
+      status: JobStatus.PROCESSING,
     });
     const queue = getFunctions().taskQueue("processPodcastGeneration");
     const targetUri = await getFunctionUrl("processPodcastGeneration");
@@ -61,7 +32,7 @@ export const generatePodcast = onCall(async (request) => {
     );
     return { 
       jobId: jobRef.id,
-      status: "queued", 
+      status: JobStatus.QUEUED, 
       message: "Podcast generation has been queued" 
     };
   } catch (error) {
@@ -69,6 +40,7 @@ export const generatePodcast = onCall(async (request) => {
     throw new Error(`Failed to start podcast generation: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
+
 // Function to process the actual podcast generation
 export const processPodcastGeneration = onTaskDispatched(
   {
@@ -84,7 +56,7 @@ export const processPodcastGeneration = onTaskDispatched(
     const sourceTexts = req.data.sourceTexts;
     const jobId = req.data.jobId;
     const options = req.data.options;
-    logger.info("Processing podcast generation task", { structuredData: true });
+    logger.info("Processing podcast generation task");
     try {
       if (options.format === "roundtable") {
         const result = await endToEndPodcastFlow({ jobId, sourceTexts, options });
@@ -98,3 +70,77 @@ export const processPodcastGeneration = onTaskDispatched(
     }
   }
 );
+
+// Function to trigger synthesis task
+export const triggerSynthesis = onCall(async (request) => {
+  try {
+    const jobRef = db.collection(JOBS_COLLECTION).doc();
+    await jobRef.set({
+      status: JobStatus.QUEUED,
+      request: request.data
+    });
+
+    const queue = getFunctions().taskQueue("processSynthesis");
+    const targetUri = await getFunctionUrl("processSynthesis");
+    
+    await queue.enqueue(
+      { 
+        jobId: jobRef.id,
+        request: request.data
+      },
+      {
+        dispatchDeadlineSeconds: 60 * 30, // 30 minute deadline
+        uri: targetUri,
+      }
+    );
+
+    return {
+      jobId: jobRef.id,
+      status: JobStatus.QUEUED,
+      message: "Synthesis has been queued"
+    };
+
+  } catch (error) {
+    logger.error("Error enqueueing synthesis task", error);
+    throw new Error(`Failed to start synthesis: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+// Function to process the actual synthesis
+export const processSynthesis = onTaskDispatched(
+  {
+    retryConfig: {
+      maxAttempts: 3,
+      minBackoffSeconds: 60,
+    },
+    rateLimits: {
+      maxConcurrentDispatches: 5,
+    },
+  },
+  async (req: { data: { jobId: string, request: SynthesisRequest } }) => {
+    const { jobId, request } = req.data;
+    logger.info("Processing synthesis task");
+
+    try {
+      const jobRef = db.collection(JOBS_COLLECTION).doc(jobId);
+      await jobRef.update({ status: JobStatus.PROCESSING });
+
+      const result = await synthesize(request);
+      
+      await jobRef.update({
+        status: JobStatus.COMPLETED,
+        result,
+      });
+
+      logger.info("Synthesis completed successfully", { jobId });
+    } catch (error) {
+      logger.error("Error during synthesis", { error, jobId });
+      await db.collection(JOBS_COLLECTION).doc(jobId).update({
+        status: JobStatus.ERROR,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+);
+

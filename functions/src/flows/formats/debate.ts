@@ -1,38 +1,19 @@
 import { z } from "genkit";
-import { basePodcastOptionsSchema, moderatorSchema } from "../../types";
 import { ai } from "../../config";
-import * as admin from "firebase-admin";
 import { gemini15Flash } from "@genkit-ai/googleai";
-
-export const debateSideSchema = z.object({
-    sideName: z.string(),
-    speakers: z.array(z.string()),
-    description: z.string().optional(),
-    keyPoints: z.array(z.string()).optional()
-  });
-  
-  export const debatePodcastOptionsSchema = basePodcastOptionsSchema.extend({
-    format: z.literal("debate"),
-    debateTopic: z.string().optional(),
-    debateStructure: z.enum(["formal", "open"]).optional(),
-    numRounds: z.number().min(1).max(10).optional(),
-    moderator: moderatorSchema.optional(),
-    autoAssignSides: z.boolean().optional(),
-    sides: z.array(debateSideSchema).optional()
-  });
+import { debatePodcastOptionsSchema } from "../../schemas/formats/debate";
 
 const finalPodcastScriptInputSchema = z.object({
   summary: z.string(),
   hooks: z.array(z.string()),
-  options: debatePodcastOptionsSchema,
-  jobId: z.string()
+  options: debatePodcastOptionsSchema
 });
 
 const finalPodcastScriptOutputSchema = z.object({
-  scriptSections: z.array(
+  script: z.array(
     z.object({
       speaker: z.string(),
-      lines: z.array(z.string()),
+      text: z.string(),
     })
   ),
 });
@@ -44,9 +25,7 @@ export const debatePodcastScriptFlow = ai.defineFlow(
     outputSchema: finalPodcastScriptOutputSchema,
   },
   async (inputValues) => {
-    const { summary, hooks, options, jobId } = inputValues;
-    const jobRef = admin.firestore().collection('podcastJobs').doc(jobId);
-    await jobRef.update({currentStep: 'generating_script'});
+    const { summary, hooks, options } = inputValues;
 
     const speakerIntros = options.speakers.map(speaker => 
       speaker.background ? 
@@ -109,9 +88,7 @@ export const debatePodcastScriptFlow = ai.defineFlow(
       output: { schema: finalPodcastScriptOutputSchema },
     });
 
-    const scriptSections = scriptResponse.output?.scriptSections || [];
-    await jobRef.update({scriptCompleted: true});
-
-    return { scriptSections };
+    const script = scriptResponse.output?.script || [];
+    return { script };
   }
 );
