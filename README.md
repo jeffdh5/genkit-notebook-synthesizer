@@ -69,12 +69,13 @@ Before getting started, you'll need:
 ## Quickstart
 Here's how can you can quickly get started and see your first podcast uploaded to Cloud Storage:
 
-1. ```bash
+1. 
+```bash
 vim functions/.env
 ```
 
 2. Grab your API Key from makersuite.google.com, and paste it in the .env:
-```
+```bash
 GOOGLE_API_KEY=xxxxx
 ```
 
