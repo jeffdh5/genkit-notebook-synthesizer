@@ -64,29 +64,29 @@ Get started quickly, customize as needed, and bring AI-powered research synthesi
 
 ## Who is This For?  
 
-This starter kit is designed for **developers, startups, and researchers** looking to integrate **AI-powered content synthesis** into their applications without building everything from scratch.  
+This starter kit is designed for developers, startups, and researchers looking to integrate AI-powered content synthesis into their applications without building everything from scratch.  
 
 ### Ideal Users  
 
-✅ **Indie AI SaaS Builders**  
-- Want to build AI-powered **podcast generation tools** that create engaging roundtables, interviews, and debates.
-- Looking to expand into other **engaging content formats** like interactive FAQs and study guides.
-- Need a **Firebase-friendly** solution to deploy quickly.
+Indie AI SaaS Builders  
+- Want to build AI-powered podcast generation tools that create engaging roundtables, interviews, and debates.
+- Looking to expand into other engaging content formats like interactive FAQs and study guides.
+- Need a Firebase-friendly solution to deploy quickly.
 
-✅ **Developers Building AI-Powered Content Tools**  
-- Want to transform documents and transcripts into **engaging audio discussions and structured learning materials.**
-- Need a **prebuilt pipeline** for generating natural-sounding podcasts, with plans to support other interactive formats.
-- Prefer **a modular, extendable system** rather than writing everything manually.
+Developers Building AI-Powered Content Tools  
+- Want to transform documents and transcripts into engaging audio discussions and structured learning materials.
+- Need a prebuilt pipeline for generating natural-sounding podcasts, with plans to support other interactive formats.
+- Prefer a modular, extendable system rather than writing everything manually.
 
-✅ **Researchers & Educators**  
-- Need to **turn research papers and materials into engaging audio discussions** that students will actually consume.
-- Want to eventually support generating **interactive study guides and Q&A formats** that make learning more engaging.
-- Looking for **an open-source alternative to NotebookLM** that prioritizes engaging, multi-format content.
+Researchers & Educators  
+- Need to turn research papers and materials into engaging audio discussions that students will actually consume.
+- Want to eventually support generating interactive study guides and Q&A formats that make learning more engaging.
+- Looking for an open-source alternative to NotebookLM that prioritizes engaging, multi-format content.
 
-✅ **Startups & Companies Experimenting with AI**  
-- Want to **quickly prototype AI podcast generation** with plans to expand into other engaging content formats.
-- Need **a flexible system** that allows customizing voices, discussion styles, and content formats.
-- Prefer a **serverless, Firebase-compatible backend** that scales without DevOps overhead.
+Startups & Companies Experimenting with AI  
+- Want to quickly prototype AI podcast generation with plans to expand into other engaging content formats.
+- Need a flexible system that allows customizing voices, discussion styles, and content formats.
+- Prefer a serverless, Firebase-compatible backend that scales without DevOps overhead.
 
 ## Detailed Usage
 You can easily generate AI-powered podcasts from any text content by configuring the synthesis options. The system is flexible and can handle various podcast formats including:
