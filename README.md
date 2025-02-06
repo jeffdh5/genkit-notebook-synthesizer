@@ -130,7 +130,7 @@ export const simpleRoundtableConfig = {
   },
   discussionStyle: "expert_panel",
   structure: "moderated_topics",
-  bucketName: "your-storage-bucket.appspot.com",
+  bucketName: "your-storage-bucket.firebasestorage.app",
   transcriptStorage: "transcripts",
   audioStorage: "audio"
 };
@@ -162,7 +162,7 @@ export const simpleInterviewConfig = {
   intervieweeName: "Dr. James Wilson",
   topic: "Future of AI Technology",
   maxQuestions: 5,
-  bucketName: "your-storage-bucket.appspot.com",
+  bucketName: "your-storage-bucke.firebasestorage.app",
   transcriptStorage: "transcripts",
   audioStorage: "audio"
 };
@@ -217,7 +217,7 @@ export const ethicalDebateConfig = {
       ]
     }
   ],
-  bucketName: "smarthome-d6e27.firebasestorage.app",
+  bucketName: "your-storage-bucket.firebasestorage.app",
   transcriptStorage: "transcripts",
   audioStorage: "audio"
 }; 
