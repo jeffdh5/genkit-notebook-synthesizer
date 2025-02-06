@@ -23,8 +23,8 @@ Before getting started, you'll need:
    - A Firebase project with Blaze (pay-as-you-go) plan enabled
    - Firebase CLI installed (`npm install -g firebase-tools`)
    - Logged in to Firebase (`firebase login`)
-   - Enable Firestore Database in your Firebase Console (in test mode)
-   - Enable Cloud Storage in your Firebase Console (in test mode)
+   - Enable Firestore Database in your Firebase Console
+   - Enable Cloud Storage in your Firebase Console
 
 ## Quickstart
 Here's how can you can quickly get started and see your first podcast uploaded to Cloud Storage:
