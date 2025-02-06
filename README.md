@@ -1,6 +1,7 @@
 # Open-Source NotebookLM Sample 
 
-Build your own NotebookLM-style application using this sample as a starting point.
+Build your own NotebookLM-style application using this sample as a starting point. Powered by [Genkit](https://genkit.dev)
+
 
 ## Prerequisites
 Before getting started, you'll need:
