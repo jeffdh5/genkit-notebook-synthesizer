@@ -4,6 +4,7 @@ Build your own NotebookLM-style application using this sample as a starting poin
 
 Here's an [example](https://github.com/jeffdh5/genkit-notebook-synthesizer/raw/refs/heads/main/synthesis/podcast_audio_expert-interview.mp3) - interview generated from an LLM research paper on L1 regularization.
 
+
 ## Prerequisites
 Before getting started, you'll need:
 
@@ -44,8 +45,8 @@ GOOGLE_API_KEY=xxxxx
 
 4. Run the test command:
 ```bash
-cd functions
-ts-node src/scripts/testPodcastTemplates.ts
+cd synthesis
+ts-node src/examples/llm-paper-summary/index.ts
 ```
 ## Local Development
 For detailed setup instructions, please see [setup.md](setup.md).
