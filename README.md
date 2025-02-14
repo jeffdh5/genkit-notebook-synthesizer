@@ -33,7 +33,7 @@ Here's how can you can quickly get started and see your first podcast uploaded t
 
 1. Create a .env file:
 ```bash
-vim functions/.env
+vim synthesis/.env
 ```
 
 2. Grab your API Key from makersuite.google.com, and paste it in the .env:
