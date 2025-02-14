@@ -48,8 +48,6 @@ GOOGLE_API_KEY=xxxxx
 cd synthesis
 ts-node src/examples/llm-paper-summary/index.ts
 ```
-## Local Development
-For detailed setup instructions, please see [setup.md](setup.md).
 
 ## What's Included?  
 - **AI-powered synthesis utilities** – Out-of-the-box utilities for converting diverse input sources (PDFs, text, and more coming soon) into structured, consumable audio formats like roundtable discussions, formal debates, and expert interviews. This codebase is meant to be used as a starting point for your own customizable pipelines.
