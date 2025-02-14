@@ -2,7 +2,7 @@
 
 Build your own NotebookLM-style application using this sample as a starting point. Powered by [Genkit](https://genkit.dev).
 
-Here's an [example](https://github.com/jeffdh5/genkit-notebook-synthesizer/blob/main/synthesis/podcast_audio_expert-interview.mp3).
+Here's an [example]([https://github.com/jeffdh5/genkit-notebook-synthesizer/blob/main/synthesis/podcast_audio_expert-interview.mp3](https://github.com/jeffdh5/genkit-notebook-synthesizer/raw/refs/heads/main/synthesis/podcast_audio_expert-interview.mp3)).
 
 
 ## Prerequisites
