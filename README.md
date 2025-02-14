@@ -41,7 +41,7 @@ vim synthesis/.env
 GOOGLE_API_KEY=xxxxx
 ```
 
-3. Go to Firebase Console, navigate to Project Settings > Service Accounts, click "Generate New Private Key" to download your admin SDK credentials as a JSON file. Save this file as `credentials.json` in your `functions/` directory.
+3. Go to Firebase Console, navigate to Project Settings > Service Accounts, click "Generate New Private Key" to download your admin SDK credentials as a JSON file. Save this file as `credentials.json` in your `synthesis/` directory.
 
 4. Run the test command:
 ```bash
