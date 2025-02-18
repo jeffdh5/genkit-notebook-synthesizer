@@ -12,6 +12,7 @@
   "dependencies": {
     "@genkit-ai/googleai": "^1.0.4",
     "@google-cloud/text-to-speech": "^5.8.0",
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "firebase-admin": "^13.1.0",
