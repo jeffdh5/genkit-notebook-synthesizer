@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import textToSpeech from "@google-cloud/text-to-speech";
+import textToSpeech, { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { genkit } from "genkit";
 import { googleAI } from "@genkit-ai/googleai";
 import { gemini15Flash } from "@genkit-ai/googleai";
@@ -8,39 +8,63 @@ import fs from 'fs';
 
 dotenv.config();
 
-export const USE_CLOUD_STORAGE = false;
-export const USE_FIRESTORE = false;
+export const USE_CLOUD_STORAGE = true;
+export const USE_FIRESTORE = true;
+
 let db: admin.firestore.Firestore | null;
 let firebaseAdmin: admin.app.App | null;
 let storage: admin.storage.Storage | null;
+let authConfig: admin.AppOptions;
 
-// Load credentials from credentials.json file
-const credentials = JSON.parse(fs.readFileSync('credentials.json', 'utf-8'));
+console.log("at config", process.env.NODE_ENV);
 
-if (USE_CLOUD_STORAGE || USE_FIRESTORE) {
-    if (!admin.apps.length) {
-        const adminConfig: admin.AppOptions = {
-          credential: admin.credential.cert(credentials)
-        };
-        admin.initializeApp(adminConfig);
-    }
-    firebaseAdmin = admin.app();
-    storage = firebaseAdmin.storage();
-    db = firebaseAdmin.firestore();
+if (process.env.NODE_ENV === 'production') {
+  authConfig = {
+    credential: admin.credential.applicationDefault()
+  };
 } else {
-    firebaseAdmin = null;
-    storage = null;
-    db = null;
+  const credentials = JSON.parse(fs.readFileSync('credentials.json', 'utf-8'));
+  authConfig = {
+    credential: admin.credential.cert(credentials)
+  };
 }
 
-export { firebaseAdmin,storage, db}
+if (USE_CLOUD_STORAGE || USE_FIRESTORE) {
+  if (!admin.apps.length) {
+    admin.initializeApp(authConfig);
+  }
+  firebaseAdmin = admin.app();
+} else {
+  firebaseAdmin = null;
+}
 
-// Collection constants
+if (USE_CLOUD_STORAGE && !!firebaseAdmin) {
+  storage = firebaseAdmin.storage();
+} else {
+  storage = null;
+}
+
+if (USE_FIRESTORE && !!firebaseAdmin) {
+  db = firebaseAdmin.firestore();
+} else {
+  db = null;
+}
+
+let ttsCredentials;
+let tts: TextToSpeechClient;
+
+if (process.env.NODE_ENV === 'production') {
+  tts = new textToSpeech.TextToSpeechClient();
+} else {
+  ttsCredentials = JSON.parse(fs.readFileSync('credentials.json', 'utf-8'));
+  tts = new textToSpeech.TextToSpeechClient({
+    credentials: ttsCredentials
+  });
+}
+
 export const JOBS_COLLECTION = "jobs";
 
-export const tts = new textToSpeech.TextToSpeechClient({
-  credentials: credentials
-});
+export { firebaseAdmin, storage, db, tts };
 
 export const ai = genkit({
   plugins: [googleAI()],

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import pdf from 'pdf-parse';
 import path from 'path';
-import { synthesize } from '../../index';
+import { synthesize } from '../../synthesis';
 import { InterviewPodcastOptions, SynthesisRequest } from '../../schemas/podcast';
 
 const dataBuffer = fs.readFileSync(path.join(__dirname, 'regularization.pdf'));
