@@ -1,4 +1,4 @@
-import { z } from "genkit";
+import { z } from "zod";
 
 export const speakerSchema = z.object({
   name: z.string(),
@@ -23,3 +23,4 @@ export const moderatorSchema = z.object({
   openingRemarks: z.boolean().optional(),
   closingRemarks: z.boolean().optional()
 });
+

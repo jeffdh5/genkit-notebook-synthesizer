@@ -1,5 +1,5 @@
 import { z } from "genkit";
-import { ai, db, JOBS_COLLECTION } from "../config";
+import { ai, db, JOBS_COLLECTION, USE_CLOUD_STORAGE, USE_FIRESTORE } from "../config";
 import { podcastOptionsSchema } from "../schemas/podcast";
 import { summarizeSourcesFlow } from "./summarizeSource";
 import { synthesizeAudioFlow } from "./synthesizeAudio";
@@ -42,6 +42,7 @@ export const endToEndPodcastFlow = ai.defineFlow(
     const metrics: Record<string, number> = {};
 
     const logJobStatus = (status: JobStatus, data: any = {}) => {
+      console.log(db, USE_CLOUD_STORAGE, USE_FIRESTORE)
       if (db) {
         const jobRef = db.collection(JOBS_COLLECTION).doc(input.jobId);
         return jobRef.set(data, { merge: true });
