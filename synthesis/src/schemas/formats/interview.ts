@@ -11,12 +11,6 @@ export const interviewPodcastOptionsSchema = basePodcastOptionsSchema.extend({
     // The topic or guiding question for the interview.
     // If omitted, AI infers a topic based on input content.
     topic: z.string().optional(),
-    
-    // Defines how structured the interview should be:
-    // - "scripted" → AI follows predefined questions
-    // - "freeform" → AI asks dynamic, conversation-style questions
-    interviewStyle: z.enum(["scripted", "freeform"]).optional(),
-    
     // If true, multiple interviewers take turns asking questions.
     // If false, the first "host" in `speakers[]` is the only interviewer.
     rotatingInterviewers: z.boolean().optional(),

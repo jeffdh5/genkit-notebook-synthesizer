@@ -1,6 +1,8 @@
 import fs from 'fs';
 import pdf from 'pdf-parse';
 import path from 'path';
+import { synthesize } from '../../index';
+import { InterviewPodcastOptions, SynthesisRequest } from '../../schemas/podcast';
 
 const dataBuffer = fs.readFileSync(path.join(__dirname, 'regularization.pdf'));
 
@@ -14,10 +16,7 @@ async function loadInput() {
   return sourceText;
 }
 
-import { synthesize } from '../../index';
-import { InterviewPodcastOptions, SynthesisRequest } from '../../schemas/podcast';
-
-async function generateSummary() {
+async function main() {
   const inputText = await loadInput();
   const expertInterviewConfig: InterviewPodcastOptions = {
     format: "interview",
@@ -36,7 +35,6 @@ async function generateSummary() {
     ],
     intervieweeName: "Dr. James Wilson",
     topic: "Latest Breakthroughs in AI Research",
-    interviewStyle: "freeform",
     maxQuestions: 8,
     bucketName: "smarthome-d6e27.firebasestorage.app",
     transcriptStorage: "transcripts",
@@ -51,6 +49,6 @@ async function generateSummary() {
   console.log(result);
 }
 
-generateSummary();
+main();
 
 

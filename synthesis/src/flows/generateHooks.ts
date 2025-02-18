@@ -33,12 +33,8 @@ export const discussionHooksFlow = ai.defineFlow(
       config: { temperature: 0.7 },
       output: { schema: discussionHooksOutputSchema },
     });
-
-    const hooks = hookResponse.text
-      .split(/\n/g)
-      .map((line: string) => line.trim())
-      .filter(Boolean);
-
-    return { hooks };
+    
+    const hooks = hookResponse.output;
+    return hooks || {hooks: []};
   }
 );

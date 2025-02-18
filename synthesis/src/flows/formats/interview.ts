@@ -52,16 +52,13 @@ export const interviewPodcastScriptFlow = ai.defineFlow(
       - Create natural conversation flow
       - Balance depth with accessibility
       - Returns valid JSON array (speaker + lines)
-      ${options.interviewStyle === 'scripted' ?
-        'Structure this as a scripted interview with clear, pre-planned questions.' :
-        'Structure this as a freeform interview with natural conversation flow, follow-up questions, and realistic speech patterns like "um", "uh", brief pauses (...), and occasional self-corrections that make it feel like an unplanned conversation.'}
       ${options.rotatingInterviewers ?
         'Multiple interviewers should take turns asking questions.' :
         'The first listed host should be the primary interviewer.'}
 
       ${options.maxQuestions ?
         `Include up to ${options.maxQuestions} main questions.` :
-        'Include approximately 10 main questions.'}
+        'Include approximately 10 main questions in the interview.'}
 
       These scripts should be based on the following input sources (summarized below):
       ====== BEGIN SUMMARY ======
