@@ -16,8 +16,6 @@ let firebaseAdmin: admin.app.App | null;
 let storage: admin.storage.Storage | null;
 let authConfig: admin.AppOptions;
 
-console.log("at config", process.env.NODE_ENV);
-
 if (process.env.NODE_ENV === 'production') {
   authConfig = {
     credential: admin.credential.applicationDefault()
