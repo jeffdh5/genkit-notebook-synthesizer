@@ -20,13 +20,6 @@ Before getting started, you'll need:
    - Click "Get API Key" in the top right
    - Create a new API key or use an existing one
    - Copy the API key - you'll need this for the `.env` file
-3. **Firebase Project (OPTIONAL)**
-   - Comes batteries included - easily store generated podcast metadata in Firestore and Cloud Storage (however, is fully optional)
-   - A Firebase project with Blaze (pay-as-you-go) plan enabled
-   - Firebase CLI installed (`npm install -g firebase-tools`)
-   - Logged in to Firebase (`firebase login`)
-   - Enable Firestore Database in your Firebase Console
-   - Enable Cloud Storage in your Firebase Console
 
 ## Quickstart
 Here's how can you can quickly get started and see your first podcast uploaded to Cloud Storage:
@@ -203,3 +196,13 @@ export const ethicalDebateConfig = {
 }; 
 ```
 > **Note**: For detailed configuration schemas and options for each podcast format, see the TypeScript interfaces in `src/schemas/*.ts`
+
+
+## ADDITIONAL CONFIGURATION
+3. **Firebase Project (OPTIONAL)**
+   - Comes batteries included - easily store generated podcast metadata in Firestore and Cloud Storage (however, is fully optional)
+   - A Firebase project with Blaze (pay-as-you-go) plan enabled
+   - Firebase CLI installed (`npm install -g firebase-tools`)
+   - Logged in to Firebase (`firebase login`)
+   - Enable Firestore Database in your Firebase Console
+   - Enable Cloud Storage in your Firebase Console
