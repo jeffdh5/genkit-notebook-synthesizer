@@ -1,6 +1,5 @@
-import fetch from "node-fetch";
+import axios from "axios";
 import pdfParse from "pdf-parse";
-import fs from "fs/promises";
 import path from "path";
 import mammoth from "mammoth"; // For .docx
 import { storage } from './config';
@@ -62,13 +61,14 @@ export async function getTextFromUrl(url: string): Promise<{ isText: boolean, co
       buffer = fileBuffer;
     } else {
       // Handle regular URL
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to download file: ${response.statusText}`);
-      }
-      contentType = response.headers.get("Content-Type") || "";
-      const blob = await response.arrayBuffer();
-      buffer = Buffer.from(blob);
+      const response = await axios.get(url, {
+        responseType: 'arraybuffer',
+        headers: {
+          'Accept': '*/*'
+        }
+      });
+      contentType = response.headers['content-type'] || "";
+      buffer = Buffer.from(response.data);
     }
 
     const extension = path.extname(url).toLowerCase();
