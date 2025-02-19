@@ -41,7 +41,6 @@ async function main() {
     audioStorage: "audio"
   }; 
   const req: SynthesisRequest = {
-    jobId: 'llm-paper-summary',
     input: inputText,
     output: [{type: "podcast", options: expertInterviewConfig}]
   }

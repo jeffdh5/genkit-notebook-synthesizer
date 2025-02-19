@@ -31,7 +31,6 @@ export type OutputConfig =
  * Main Synthesis Request
  */
 export interface SynthesisRequest {
-    jobId: string;
     /** The input source(s) for synthesis */
     input: string | string[]; // Supports multiple sources (PDFs, URLs, etc.)
     /** The desired output formats */
