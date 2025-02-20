@@ -45,4 +45,6 @@ export interface SynthesisResult {
 // TODO: Need to figure out how to handle remote storage of the actual files generated
 export interface PodcastResult {
   transcript: string;
+  storageUrl: string;
+  audioFilename: string;
 }

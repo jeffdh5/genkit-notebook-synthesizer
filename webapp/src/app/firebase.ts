@@ -15,6 +15,7 @@ const firebaseConfig = {
   appId: "xxxxx"
 };
 
+export const bucketName = firebaseConfig.storageBucket;
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const functions = getFunctions(getApp());

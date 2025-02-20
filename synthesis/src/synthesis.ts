@@ -6,7 +6,6 @@ import { getTextFromUrl, isUrl } from './util';
 
 
 export async function synthesize(request: SynthesisRequest): Promise<SynthesisResult> {
-  console.log("REQ", JSON.stringify(request, null, 2));
   const results: SynthesisResult = {};
   
   for (const output of request.output) {
@@ -38,7 +37,6 @@ async function generatePodcast(input: string | string[], options: PodcastOptions
       }
     }
   }
-
   // Call the end-to-end podcast generation flow
   const result = await endToEndPodcastFlow({
     sourceTexts,
@@ -48,5 +46,7 @@ async function generatePodcast(input: string | string[], options: PodcastOptions
 
   return {
     transcript: JSON.stringify(result.script),
+    audioFilename: result.audioFileName,
+    storageUrl: result.storageUrl
   };
 }
