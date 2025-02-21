@@ -7,12 +7,12 @@ dotenv.config();
 
 // Replace with your own configuration
 const firebaseConfig = {
-  apiKey: "xxxxx",
-  authDomain: "xxxxx.firebaseapp.com", 
-  projectId: "xxxxx",
-  storageBucket: "xxxxx.firebasestorage.app",
-  messagingSenderId: "xxxxx",
-  appId: "xxxxx"
+  apiKey: "AIzaSyABno1xvsx6O2Q_aIplxGy4Ie9TzpRvQX0",
+  authDomain: "genkit-notebooklm-57bd9.firebaseapp.com",
+  projectId: "genkit-notebooklm-57bd9",
+  storageBucket: "genkit-notebooklm-57bd9.firebasestorage.app",
+  messagingSenderId: "762217079520",
+  appId: "1:762217079520:web:2f61032dd5bd875f33a685"
 };
 
 export const bucketName = firebaseConfig.storageBucket;

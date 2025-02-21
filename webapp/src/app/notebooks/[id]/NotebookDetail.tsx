@@ -138,8 +138,8 @@ export function NotebookDetailClient({ id }: NotebookDetailClientProps) {
         input: sources,
         output: [{ type: 'podcast', options: podcastOptions }]
       };
-
-      const response = await axios.post('http://localhost:8080/api/synthesis', synthesisRequest);
+      const host = 'https://synthesis-api-762217079520.us-central1.run.app';
+      const response = await axios.post(`${host}/api/synthesis`, synthesisRequest);
       const data = response.data;
       
       if (data.status === 'success' && data.result.podcast.storageUrl) {
